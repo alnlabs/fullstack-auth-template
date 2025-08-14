@@ -42,6 +42,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <Toolbar />
           <Box
             sx={{
+              p: 3, // Add padding to tab content area
               width: 1, // This is 100% according to MUI System
               maxWidth: "none",
             }}

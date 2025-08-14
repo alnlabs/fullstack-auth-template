@@ -85,7 +85,7 @@ export default function SettingsPage() {
             <Typography variant="h4" sx={spacing.title}>
               Change Password
             </Typography>
-            
+
             <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
               <TextField
                 fullWidth
@@ -145,7 +145,7 @@ export default function SettingsPage() {
             <Typography variant="h4" sx={spacing.title}>
               Notification Settings
             </Typography>
-            
+
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <FormControlLabel
                 control={
@@ -199,11 +199,11 @@ export default function SettingsPage() {
             <Typography variant="h4" sx={spacing.title}>
               Application Settings
             </Typography>
-            
+
             <Alert severity="info" sx={{ mb: 3 }}>
               Additional application settings will be available soon.
             </Alert>
-            
+
             <Typography color="text.secondary" variant="body1">
               More customization options are coming in future updates.
             </Typography>

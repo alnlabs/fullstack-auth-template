@@ -9,6 +9,7 @@ import {
   Storage as StorageIcon,
 } from "@mui/icons-material";
 import AdminLayout from "@/components/layout/AdminLayout";
+import TabContent from "@/components/widgets/TabContent";
 import StatCard from "@/components/widgets/StatCard";
 
 export default function AdminDashboardPage() {
@@ -20,11 +21,9 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <Box
-        sx={{
-          width: 1, // This is 100% according to MUI System
-          maxWidth: "none",
-        }}
+      <TabContent 
+        title="Admin Dashboard"
+        subtitle="Overview of system statistics and performance"
       >
         {/* Stats Grid */}
         <Box
@@ -100,7 +99,7 @@ export default function AdminDashboardPage() {
             />
           </Box>
         </Box>
-      </Box>
+      </TabContent>
     </AdminLayout>
   );
 }

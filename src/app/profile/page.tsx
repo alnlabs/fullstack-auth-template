@@ -51,7 +51,9 @@ export default function ProfilePage() {
     }
   };
 
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -89,7 +91,7 @@ export default function ProfilePage() {
             <Typography variant="h4" sx={spacing.title}>
               Personal Information
             </Typography>
-            
+
             <Box sx={spacing.userInfo} mb={4}>
               <Avatar src={user.image || undefined} sx={spacing.avatar}>
                 <PersonIcon sx={{ fontSize: 50 }} />

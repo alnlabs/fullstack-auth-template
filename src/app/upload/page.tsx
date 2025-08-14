@@ -126,13 +126,13 @@ export default function UploadPage() {
             <Typography variant="h4" sx={spacing.title}>
               Upload Documents
             </Typography>
-            
+
             <Box sx={{ textAlign: "center", mb: 4 }}>
               <UploadIcon sx={{ ...spacing.icon, color: "primary.main" }} />
               <Typography variant="body1" color="text.secondary" mb={3}>
                 Select files to upload to your account
               </Typography>
-              
+
               <input
                 accept="*/*"
                 style={{ display: "none" }}
@@ -162,8 +162,18 @@ export default function UploadPage() {
                 </Typography>
                 <List>
                   {fileStatuses.map((fileStatus, index) => (
-                    <ListItem key={index} sx={{ flexDirection: "column", alignItems: "flex-start" }}>
-                      <Box sx={{ display: "flex", alignItems: "center", width: "100%", mb: 1 }}>
+                    <ListItem
+                      key={index}
+                      sx={{ flexDirection: "column", alignItems: "flex-start" }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          width: "100%",
+                          mb: 1,
+                        }}
+                      >
                         <ListItemIcon>
                           {getStatusIcon(fileStatus.status)}
                         </ListItemIcon>

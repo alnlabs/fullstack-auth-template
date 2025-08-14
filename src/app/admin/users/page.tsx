@@ -25,6 +25,7 @@ import {
   Add as AddIcon,
 } from "@mui/icons-material";
 import AdminLayout from "@/components/layout/AdminLayout";
+import TabContent from "@/components/widgets/TabContent";
 import { spacing } from "@/lib/spacing";
 
 interface User {
@@ -104,30 +105,30 @@ export default function AdminUsersPage() {
     }
   };
 
+  const rightControls = (
+    <Button
+      variant="contained"
+      startIcon={<AddIcon />}
+      {...spacing.button}
+    >
+      Add User
+    </Button>
+  );
+
   return (
     <AdminLayout>
-      <Box sx={spacing.pageContainer}>
-        {/* Header */}
-        <Box sx={spacing.header}>
-          <Typography variant="h3" component="h1" fontWeight={700}>
-            User Management
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            {...spacing.button}
-          >
-            Add User
-          </Button>
-        </Box>
-
+      <TabContent 
+        title="User Management"
+        subtitle="Manage users, roles, and permissions"
+        rightControls={rightControls}
+      >
         {/* Users Table */}
         <Card sx={spacing.card}>
           <CardContent>
             <Typography variant="h4" sx={spacing.title}>
               All Users
             </Typography>
-            
+
             <TableContainer component={Paper} sx={{ mt: 3 }}>
               <Table>
                 <TableHead>
@@ -181,7 +182,7 @@ export default function AdminUsersPage() {
             </TableContainer>
           </CardContent>
         </Card>
-      </Box>
+      </TabContent>
     </AdminLayout>
   );
 }
