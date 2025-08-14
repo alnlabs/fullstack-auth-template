@@ -81,7 +81,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 8 }}>
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Card>
         <CardContent sx={{ p: 4 }}>
           <Box textAlign="center" mb={3}>

@@ -71,7 +71,7 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ mt: 8 }}>
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
         <Box textAlign="center">
           <Typography variant="h4" gutterBottom>
             Loading...
