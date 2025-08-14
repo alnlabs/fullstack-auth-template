@@ -18,10 +18,15 @@ import {
   Person as PersonIcon,
   Settings as SettingsIcon,
   AccountCircle as AccountCircleIcon,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 import { useState } from "react";
 
-export default function AdminHeader() {
+interface AdminHeaderProps {
+  onMenuClick: () => void;
+}
+
+export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -50,21 +55,31 @@ export default function AdminHeader() {
   };
 
   return (
-    <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    <AppBar
+      position="fixed"
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+    >
       <Toolbar>
+        <IconButton
+          color="inherit"
+          onClick={onMenuClick}
+          sx={{ mr: 2, display: { sm: "block" } }}
+        >
+          <MenuIcon />
+        </IconButton>
+        
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Admin Panel
         </Typography>
-        
+
         <Box display="flex" alignItems="center" gap={1}>
-          <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
+          <Typography
+            variant="body2"
+            sx={{ display: { xs: "none", sm: "block" } }}
+          >
             {user?.name || user?.email}
           </Typography>
-          <IconButton
-            size="large"
-            onClick={handleMenu}
-            color="inherit"
-          >
+          <IconButton size="large" onClick={handleMenu} color="inherit">
             <Avatar
               src={user?.image || undefined}
               sx={{ width: 32, height: 32 }}
@@ -77,12 +92,12 @@ export default function AdminHeader() {
             open={Boolean(anchorEl)}
             onClose={handleClose}
             anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
+              vertical: "bottom",
+              horizontal: "right",
             }}
             transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
+              vertical: "top",
+              horizontal: "right",
             }}
           >
             <MenuItem onClick={handleProfile}>

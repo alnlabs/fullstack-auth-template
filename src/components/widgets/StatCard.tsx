@@ -9,12 +9,12 @@ interface StatCardProps {
   subtitle?: string;
 }
 
-export default function StatCard({ 
-  title, 
-  value, 
-  icon, 
+export default function StatCard({
+  title,
+  value,
+  icon,
   color = "primary",
-  subtitle 
+  subtitle,
 }: StatCardProps) {
   return (
     <Card>
@@ -33,11 +33,7 @@ export default function StatCard({
               </Typography>
             )}
           </Box>
-          {icon && (
-            <Box color={`${color}.main`}>
-              {icon}
-            </Box>
-          )}
+          {icon && <Box color={`${color}.main`}>{icon}</Box>}
         </Box>
       </CardContent>
     </Card>

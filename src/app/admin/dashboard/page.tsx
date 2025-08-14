@@ -21,8 +21,8 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <PageHeader 
-        title="Dashboard" 
+      <PageHeader
+        title="Dashboard"
         subtitle="Welcome back! Here's what's happening with your system."
       />
 

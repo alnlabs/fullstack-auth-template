@@ -10,6 +10,7 @@ import {
   ListItemText,
   Divider,
   Box,
+  Tooltip,
 } from "@mui/material";
 import {
   Dashboard as DashboardIcon,
@@ -19,7 +20,11 @@ import {
   Home as HomeIcon,
 } from "@mui/icons-material";
 
-const drawerWidth = 240;
+interface AdminSidebarProps {
+  open: boolean;
+  drawerWidth: number;
+  collapsedWidth: number;
+}
 
 const menuItems = [
   { text: "Dashboard", icon: DashboardIcon, path: "/admin/dashboard" },
@@ -28,7 +33,7 @@ const menuItems = [
   { text: "Security", icon: SecurityIcon, path: "/admin/security" },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ open, drawerWidth, collapsedWidth }: AdminSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -44,54 +49,82 @@ export default function AdminSidebar() {
     <Drawer
       variant="permanent"
       sx={{
-        width: drawerWidth,
+        width: open ? drawerWidth : collapsedWidth,
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width: drawerWidth,
+          width: open ? drawerWidth : collapsedWidth,
           boxSizing: "border-box",
           top: "64px", // Account for AppBar height
           height: "calc(100vh - 64px)",
+          overflowX: "hidden",
+          transition: "width 0.2s",
         },
       }}
     >
       <Box sx={{ overflow: "auto", mt: 1 }}>
         <List>
           <ListItem disablePadding>
-            <ListItemButton onClick={handleHome}>
-              <ListItemIcon>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText primary="Back to Site" />
-            </ListItemButton>
+            <Tooltip title="Back to Site" placement="right" disableHoverListener={open}>
+              <ListItemButton 
+                onClick={handleHome}
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <HomeIcon />
+                </ListItemIcon>
+                {open && <ListItemText primary="Back to Site" />}
+              </ListItemButton>
+            </Tooltip>
           </ListItem>
         </List>
-        
+
         <Divider />
-        
+
         <List>
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.path;
-            
+
             return (
               <ListItem key={item.text} disablePadding>
-                <ListItemButton
-                  onClick={() => handleNavigation(item.path)}
-                  selected={isActive}
-                  sx={{
-                    "&.Mui-selected": {
-                      backgroundColor: "primary.light",
-                      "&:hover": {
+                <Tooltip title={item.text} placement="right" disableHoverListener={open}>
+                  <ListItemButton
+                    onClick={() => handleNavigation(item.path)}
+                    selected={isActive}
+                    sx={{
+                      minHeight: 48,
+                      justifyContent: open ? "initial" : "center",
+                      px: 2.5,
+                      "&.Mui-selected": {
                         backgroundColor: "primary.light",
+                        "&:hover": {
+                          backgroundColor: "primary.light",
+                        },
                       },
-                    },
-                  }}
-                >
-                  <ListItemIcon>
-                    <Icon color={isActive ? "primary" : "inherit"} />
-                  </ListItemIcon>
-                  <ListItemText primary={item.text} />
-                </ListItemButton>
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        mr: open ? 3 : "auto",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Icon color={isActive ? "primary" : "inherit"} />
+                    </ListItemIcon>
+                    {open && <ListItemText primary={item.text} />}
+                  </ListItemButton>
+                </Tooltip>
               </ListItem>
             );
           })}
