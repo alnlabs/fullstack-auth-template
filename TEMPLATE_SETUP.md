@@ -65,7 +65,7 @@ fullstack-auth-template/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/fullstack-auth-template.git
+git clone git@github.com:alnlabs/fullstack-auth-template.git
 cd fullstack-auth-template
 ```
 

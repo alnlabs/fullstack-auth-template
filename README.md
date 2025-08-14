@@ -50,7 +50,7 @@ A comprehensive, production-ready fullstack authentication and file management s
 
 ```bash
 # Clone the repository
-git clone https://github.com/alnlabs/fullstack-auth-template.git
+git clone git@github.com:alnlabs/fullstack-auth-template.git
 cd fullstack-auth-template
 
 # Run the automated setup script
@@ -61,7 +61,7 @@ cd fullstack-auth-template
 
 ```bash
 # Clone the repository
-git clone https://github.com/alnlabs/fullstack-auth-template.git
+git clone git@github.com:alnlabs/fullstack-auth-template.git
 cd fullstack-auth-template
 
 # Install dependencies
