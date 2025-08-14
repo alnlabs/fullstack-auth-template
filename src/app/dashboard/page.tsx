@@ -5,7 +5,6 @@ import { AuthenticatedOnly } from "@/lib/route-guard";
 import { useAuth } from "@/lib/auth-context";
 import {
   Box,
-  Container,
   Typography,
   Button,
   Card,
@@ -48,7 +47,7 @@ export default function DashboardPage() {
 
   return (
     <AuthenticatedOnly>
-      <Container maxWidth="lg" sx={{ mt: 4, pb: 4 }}>
+      <Box sx={{ p: 3, maxWidth: "100%", overflow: "hidden" }}>
         {/* Header */}
         <Box
           display="flex"
@@ -107,7 +106,7 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <Grid container spacing={3} mb={4}>
-          <Grid xs={12} md={3}>
+          <Grid item xs={12} md={3}>
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
                 <PersonIcon
@@ -129,7 +128,7 @@ export default function DashboardPage() {
             </Card>
           </Grid>
 
-          <Grid xs={12} md={3}>
+          <Grid item xs={12} md={3}>
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
                 <UploadIcon
@@ -151,7 +150,7 @@ export default function DashboardPage() {
             </Card>
           </Grid>
 
-          <Grid xs={12} md={3}>
+          <Grid item xs={12} md={3}>
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
                 <SettingsIcon
@@ -173,10 +172,12 @@ export default function DashboardPage() {
             </Card>
           </Grid>
 
-          <Grid xs={12} md={3}>
+          <Grid item xs={12} md={3}>
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
-                <LogoutIcon sx={{ fontSize: 48, color: "error.main", mb: 2 }} />
+                <LogoutIcon
+                  sx={{ fontSize: 48, color: "error.main", mb: 2 }}
+                />
                 <Typography variant="h6" gutterBottom>
                   Logout
                 </Typography>
@@ -207,7 +208,7 @@ export default function DashboardPage() {
             </Typography>
           </CardContent>
         </Card>
-      </Container>
+      </Box>
     </AuthenticatedOnly>
   );
 }
