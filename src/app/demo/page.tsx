@@ -43,7 +43,7 @@ export default function DemoPage() {
   const handleLoadingToast = () => {
     const toastId = ToastUtils.loading("Loading... Please wait.");
     setLoadingToastId(toastId);
-    
+
     // Simulate async operation
     setTimeout(() => {
       ToastUtils.dismiss(toastId);
@@ -59,14 +59,11 @@ export default function DemoPage() {
       }, 2000);
     });
 
-    ToastUtils.promise(
-      promise,
-      {
-        loading: "Processing...",
-        success: "Operation completed successfully!",
-        error: "Operation failed. Please try again.",
-      }
-    );
+    ToastUtils.promise(promise, {
+      loading: "Processing...",
+      success: "Operation completed successfully!",
+      error: "Operation failed. Please try again.",
+    });
   };
 
   const handleAuthToasts = () => {
@@ -95,13 +92,15 @@ export default function DemoPage() {
         Toast Notification Demo
       </Typography>
       <Typography color="text.secondary" paragraph>
-        This page demonstrates the toast notification system with different types of messages and use cases.
+        This page demonstrates the toast notification system with different
+        types of messages and use cases.
       </Typography>
 
       <Alert severity="info" sx={{ mb: 4 }}>
         <Typography variant="body2">
-          Toasts appear in the top-right corner of the screen. They automatically disappear after a few seconds,
-          or you can click the X to dismiss them manually.
+          Toasts appear in the top-right corner of the screen. They
+          automatically disappear after a few seconds, or you can click the X to
+          dismiss them manually.
         </Typography>
       </Alert>
 
@@ -181,11 +180,7 @@ export default function DemoPage() {
               </Button>
             </Grid>
             <Grid xs={12} sm={6} md={4}>
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={handlePromiseToast}
-              >
+              <Button fullWidth variant="outlined" onClick={handlePromiseToast}>
                 Promise Toast
               </Button>
             </Grid>
@@ -262,14 +257,17 @@ export default function DemoPage() {
             Usage Examples
           </Typography>
           <Divider sx={{ mb: 3 }} />
-          <Box component="pre" sx={{ 
-            backgroundColor: '#f5f5f5', 
-            p: 2, 
-            borderRadius: 1,
-            overflow: 'auto',
-            fontSize: '0.875rem'
-          }}>
-{`// Basic usage
+          <Box
+            component="pre"
+            sx={{
+              backgroundColor: "#f5f5f5",
+              p: 2,
+              borderRadius: 1,
+              overflow: "auto",
+              fontSize: "0.875rem",
+            }}
+          >
+            {`// Basic usage
 ToastUtils.success("Operation completed!");
 ToastUtils.error("Something went wrong!");
 ToastUtils.warning("Please check your input");

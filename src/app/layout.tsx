@@ -4,6 +4,7 @@ import "./globals.css";
 import ConditionalHeader from "@/components/layout/ConditionalHeader";
 import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "react-hot-toast";
+import PerformanceMonitor from "@/components/PerformanceMonitor";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -46,6 +47,7 @@ export default function RootLayout({
               },
             }}
           />
+          <PerformanceMonitor />
         </AuthProvider>
       </body>
     </html>

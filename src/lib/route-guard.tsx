@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, memo } from "react";
 import { useRouter } from "next/navigation";
 import { CircularProgress, Box, Typography } from "@mui/material";
 import { AuthUtils } from "./auth";
@@ -12,7 +12,8 @@ interface RouteGuardProps {
   showLoading?: boolean;
 }
 
-export default function RouteGuard({
+// Memoize the RouteGuard component to prevent unnecessary re-renders
+const RouteGuard = memo(function RouteGuard({
   children,
   allowedRoles = ["USER", "ADMIN", "SUPERADMIN"],
   showLoading = true,
@@ -53,49 +54,49 @@ export default function RouteGuard({
 
   // Render children if all checks pass
   return <>{children}</>;
-}
+});
 
-// Convenience components for specific roles
-export function SuperAdminOnly({
-  children,
-  ...props
-}: Omit<RouteGuardProps, "allowedRoles">) {
+// Convenience components for role-based access
+export const SuperAdminOnly = memo(function SuperAdminOnly({ 
+  children, 
+  showLoading = true 
+}: { 
+  children: ReactNode; 
+  showLoading?: boolean;
+}) {
   return (
-    <RouteGuard allowedRoles={["SUPERADMIN"]} {...props}>
+    <RouteGuard allowedRoles={["SUPERADMIN"]} showLoading={showLoading}>
       {children}
     </RouteGuard>
   );
-}
+});
 
-export function AdminOnly({
-  children,
-  ...props
-}: Omit<RouteGuardProps, "allowedRoles">) {
+export const AdminOnly = memo(function AdminOnly({ 
+  children, 
+  showLoading = true 
+}: { 
+  children: ReactNode; 
+  showLoading?: boolean;
+}) {
   return (
-    <RouteGuard allowedRoles={["ADMIN", "SUPERADMIN"]} {...props}>
+    <RouteGuard allowedRoles={["ADMIN", "SUPERADMIN"]} showLoading={showLoading}>
       {children}
     </RouteGuard>
   );
-}
+});
 
-export function UserOnly({
-  children,
-  ...props
-}: Omit<RouteGuardProps, "allowedRoles">) {
+export const AuthenticatedOnly = memo(function AuthenticatedOnly({ 
+  children, 
+  showLoading = true 
+}: { 
+  children: ReactNode; 
+  showLoading?: boolean;
+}) {
   return (
-    <RouteGuard allowedRoles={["USER"]} {...props}>
+    <RouteGuard allowedRoles={["USER", "ADMIN", "SUPERADMIN"]} showLoading={showLoading}>
       {children}
     </RouteGuard>
   );
-}
+});
 
-export function AuthenticatedOnly({
-  children,
-  ...props
-}: Omit<RouteGuardProps, "allowedRoles">) {
-  return (
-    <RouteGuard allowedRoles={["USER", "ADMIN", "SUPERADMIN"]} {...props}>
-      {children}
-    </RouteGuard>
-  );
-}
+export default RouteGuard;

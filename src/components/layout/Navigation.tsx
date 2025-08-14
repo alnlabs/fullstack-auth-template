@@ -22,7 +22,7 @@ import {
   Upload as UploadIcon,
   Science as DemoIcon,
 } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { User } from "@/lib/auth";
 
@@ -30,7 +30,8 @@ interface NavigationProps {
   user: User;
 }
 
-export default function Navigation({ user }: NavigationProps) {
+// Memoize the component to prevent unnecessary re-renders
+const Navigation = memo(function Navigation({ user }: NavigationProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -62,7 +63,6 @@ export default function Navigation({ user }: NavigationProps) {
   };
 
   const isAdmin = user.role === "ADMIN" || user.role === "SUPERADMIN";
-  const isUser = user.role === "USER";
 
   return (
     <AppBar position="static" elevation={1}>
@@ -204,4 +204,6 @@ export default function Navigation({ user }: NavigationProps) {
       </Toolbar>
     </AppBar>
   );
-}
+});
+
+export default Navigation;

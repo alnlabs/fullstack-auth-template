@@ -6,6 +6,8 @@ import {
   useEffect,
   useState,
   ReactNode,
+  useCallback,
+  useMemo,
 } from "react";
 import { useRouter } from "next/navigation";
 import { User } from "./auth";
@@ -27,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     try {
       const response = await fetch("/api/auth/me", {
         credentials: "include",
@@ -45,13 +47,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     refreshUser();
-  }, []);
+  }, [refreshUser]);
 
-  const login = async (
+  const login = useCallback(async (
     emailOrUsername: string,
     password: string
   ): Promise<boolean> => {
@@ -94,9 +96,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       const response = await fetch("/api/auth/logout", {
         method: "POST",
@@ -115,16 +117,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(null);
       router.push("/auth/login");
     }
-  };
+  }, [router]);
 
-  const value = {
+  // Memoize the context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
     user,
     loading,
     login,
     logout,
     isAuthenticated: !!user,
     refreshUser,
-  };
+  }), [user, loading, login, logout, refreshUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
