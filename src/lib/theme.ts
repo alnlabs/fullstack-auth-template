@@ -11,17 +11,16 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: [
-      'Poppins',
+      'Roboto',
       '-apple-system',
       'BlinkMacSystemFont',
       '"Segoe UI"',
-      'Roboto',
       'Arial',
       'sans-serif',
     ].join(','),
     button: {
       textTransform: 'none',
-      fontWeight: 600,
+      fontWeight: 500,
     },
     h1: {
       fontWeight: 700,
@@ -51,7 +50,7 @@ export const theme = createTheme({
         root: {
           borderRadius: 8,
           padding: '10px 24px',
-          fontWeight: 600,
+          fontWeight: 500,
         },
       },
     },

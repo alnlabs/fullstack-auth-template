@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "react-hot-toast";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import Providers from "@/components/providers/Providers";
 
-const poppins = Poppins({ 
+const roboto = Roboto({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "700"],
   display: "swap",
 });
 
@@ -25,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={poppins.className}>
+      <body className={roboto.className}>
         <Providers>
           <AuthProvider>
             {children}
