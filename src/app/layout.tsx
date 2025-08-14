@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { PT_Sans } from "next/font/google";
+import { Aleo } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "react-hot-toast";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import Providers from "@/components/providers/Providers";
 
-const ptSans = PT_Sans({
+const aleo = Aleo({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["300", "400", "700"],
   display: "swap",
 });
 
@@ -25,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={ptSans.className}>
+      <body className={aleo.className}>
         <Providers>
           <AuthProvider>
             {children}

@@ -11,7 +11,9 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: [
-      'PT Sans',
+      'Aleo',
+      'Georgia',
+      'serif',
       '-apple-system',
       'BlinkMacSystemFont',
       '"Segoe UI"',
@@ -21,25 +23,25 @@ export const theme = createTheme({
     ].join(','),
     button: {
       textTransform: 'none',
-      fontWeight: 700,
+      fontWeight: 600,
     },
     h1: {
       fontWeight: 700,
     },
     h2: {
-      fontWeight: 700,
+      fontWeight: 600,
     },
     h3: {
-      fontWeight: 700,
+      fontWeight: 600,
     },
     h4: {
-      fontWeight: 700,
+      fontWeight: 600,
     },
     h5: {
-      fontWeight: 700,
+      fontWeight: 500,
     },
     h6: {
-      fontWeight: 700,
+      fontWeight: 500,
     },
   },
   shape: {
@@ -51,7 +53,7 @@ export const theme = createTheme({
         root: {
           borderRadius: 8,
           padding: '10px 24px',
-          fontWeight: 700,
+          fontWeight: 600,
         },
       },
     },
