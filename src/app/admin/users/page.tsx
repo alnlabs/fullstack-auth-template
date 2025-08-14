@@ -9,13 +9,7 @@ import {
   Button,
   Card,
   CardContent,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  Grid,
   Chip,
   IconButton,
   TextField,
@@ -24,6 +18,12 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Avatar,
+  Divider,
+  Badge,
+  Tooltip,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -31,6 +31,15 @@ import {
   Add as AddIcon,
   Search as SearchIcon,
   FilterList as FilterIcon,
+  Person as PersonIcon,
+  AdminPanelSettings as AdminIcon,
+  SupervisedUserCircle as SuperAdminIcon,
+  CheckCircle as ActiveIcon,
+  Cancel as InactiveIcon,
+  Block as SuspendedIcon,
+  MoreVert as MoreIcon,
+  Visibility as ViewIcon,
+  Security as SecurityIcon,
 } from "@mui/icons-material";
 import AdminLayout from "@/components/layout/AdminLayout";
 import TabContent from "@/components/widgets/TabContent";
@@ -43,6 +52,8 @@ interface User {
   role: string;
   status: string;
   createdAt: string;
+  lastLogin?: string;
+  image?: string;
 }
 
 export default function AdminUsersPage() {
@@ -52,6 +63,7 @@ export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
     fetchUsers();
@@ -81,10 +93,40 @@ export default function AdminUsersPage() {
 
       if (response.ok) {
         setUsers(users.filter((u) => u.id !== userId));
-        // Toast notifications are handled by the auth context
       }
     } catch (error) {
-      // Error handling is done by the auth context
+      console.error("Failed to delete user:", error);
+    }
+  };
+
+  const handleToggleStatus = async (userId: string, currentStatus: string) => {
+    const newStatus = currentStatus === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
+    
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        setUsers(users.map(u => 
+          u.id === userId ? { ...u, status: newStatus } : u
+        ));
+      }
+    } catch (error) {
+      console.error("Failed to update user status:", error);
+    }
+  };
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case "SUPERADMIN":
+        return <SuperAdminIcon />;
+      case "ADMIN":
+        return <AdminIcon />;
+      default:
+        return <PersonIcon />;
     }
   };
 
@@ -96,6 +138,19 @@ export default function AdminUsersPage() {
         return "warning";
       default:
         return "primary";
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "ACTIVE":
+        return <ActiveIcon />;
+      case "INACTIVE":
+        return <InactiveIcon />;
+      case "SUSPENDED":
+        return <SuspendedIcon />;
+      default:
+        return <InactiveIcon />;
     }
   };
 
@@ -123,10 +178,29 @@ export default function AdminUsersPage() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
+  const stats = {
+    total: users.length,
+    active: users.filter(u => u.status === "ACTIVE").length,
+    admins: users.filter(u => u.role === "ADMIN" || u.role === "SUPERADMIN").length,
+    suspended: users.filter(u => u.status === "SUSPENDED").length,
+  };
+
   const rightControls = (
-    <Button variant="contained" startIcon={<AddIcon />} size="medium">
-      Add User
-    </Button>
+    <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+      <FormControlLabel
+        control={
+          <Switch
+            checked={viewMode === "grid"}
+            onChange={(e) => setViewMode(e.target.checked ? "grid" : "list")}
+            size="small"
+          />
+        }
+        label={viewMode === "grid" ? "Grid" : "List"}
+      />
+      <Button variant="contained" startIcon={<AddIcon />} size="medium">
+        Add User
+      </Button>
+    </Box>
   );
 
   if (!user) {
@@ -140,21 +214,54 @@ export default function AdminUsersPage() {
         subtitle="Manage users, roles, and permissions"
         rightControls={rightControls}
       >
-        {/* Filters and Search */}
+        {/* Stats Cards */}
+        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 2, mb: 3 }}>
+          <Card sx={{ ...spacing.card, height: "100%" }}>
+            <CardContent sx={{ textAlign: "center" }}>
+              <Typography variant="h4" color="primary" fontWeight={700}>
+                {stats.total}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Total Users
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card sx={{ ...spacing.card, height: "100%" }}>
+            <CardContent sx={{ textAlign: "center" }}>
+              <Typography variant="h4" color="success.main" fontWeight={700}>
+                {stats.active}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Active Users
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card sx={{ ...spacing.card, height: "100%" }}>
+            <CardContent sx={{ textAlign: "center" }}>
+              <Typography variant="h4" color="warning.main" fontWeight={700}>
+                {stats.admins}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Administrators
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card sx={{ ...spacing.card, height: "100%" }}>
+            <CardContent sx={{ textAlign: "center" }}>
+              <Typography variant="h4" color="error.main" fontWeight={700}>
+                {stats.suspended}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Suspended
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
+
+        {/* Filters */}
         <Card sx={{ ...spacing.card, ...spacing.sectionSpacing }}>
           <CardContent>
-            <Typography variant="h5" sx={spacing.title}>
-              Search & Filters
-            </Typography>
-
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                flexWrap: "wrap",
-                alignItems: "center",
-              }}
-            >
+            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", alignItems: "center" }}>
               <TextField
                 placeholder="Search users..."
                 value={searchTerm}
@@ -197,24 +304,7 @@ export default function AdminUsersPage() {
                   <MenuItem value="SUSPENDED">Suspended</MenuItem>
                 </Select>
               </FormControl>
-            </Box>
-          </CardContent>
-        </Card>
 
-        {/* Users Table */}
-        <Card sx={spacing.card}>
-          <CardContent>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 3,
-              }}
-            >
-              <Typography variant="h5" sx={spacing.title}>
-                All Users ({filteredUsers.length})
-              </Typography>
               <Chip
                 icon={<FilterIcon />}
                 label={`${filteredUsers.length} of ${users.length} users`}
@@ -222,87 +312,179 @@ export default function AdminUsersPage() {
                 size="small"
               />
             </Box>
+          </CardContent>
+        </Card>
 
-            <TableContainer component={Paper} sx={{ maxHeight: 600 }}>
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>Role</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>Created</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredUsers.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                        <Typography color="text.secondary">
-                          {searchTerm ||
-                          roleFilter !== "all" ||
-                          statusFilter !== "all"
-                            ? "No users match your filters"
-                            : "No users found"}
+        {/* Users Grid/List */}
+        {viewMode === "grid" ? (
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 2 }}>
+            {filteredUsers.length === 0 ? (
+              <Card sx={spacing.card}>
+                <CardContent sx={{ textAlign: "center", py: 4 }}>
+                  <Typography color="text.secondary">
+                    {searchTerm || roleFilter !== "all" || statusFilter !== "all"
+                      ? "No users match your filters"
+                      : "No users found"}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ) : (
+              filteredUsers.map((user) => (
+                <Card key={user.id} sx={{ ...spacing.card, height: "100%" }}>
+                  <CardContent>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                      <Badge
+                        overlap="circular"
+                        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                        badgeContent={
+                          <Box
+                            sx={{
+                              width: 12,
+                              height: 12,
+                              borderRadius: "50%",
+                              bgcolor: getStatusColor(user.status || "ACTIVE") + ".main",
+                              border: "2px solid white",
+                            }}
+                          />
+                        }
+                      >
+                        <Avatar
+                          src={user.image || undefined}
+                          sx={{ width: 56, height: 56 }}
+                        >
+                          {getRoleIcon(user.role || "USER")}
+                        </Avatar>
+                      </Badge>
+                      <Box sx={{ ml: 2, flex: 1 }}>
+                        <Typography variant="h6" fontWeight={600}>
+                          {user.name || "No Name"}
                         </Typography>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredUsers.map((user) => (
-                      <TableRow key={user.id} hover>
-                        <TableCell>
-                          <Typography variant="body2" fontWeight={500}>
+                        <Typography variant="body2" color="text.secondary">
+                          {user.email || "No Email"}
+                        </Typography>
+                      </Box>
+                      <IconButton size="small">
+                        <MoreIcon />
+                      </IconButton>
+                    </Box>
+
+                    <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+                      <Chip
+                        icon={getRoleIcon(user.role || "USER")}
+                        label={user.role || "USER"}
+                        color={getRoleColor(user.role || "USER")}
+                        size="small"
+                        variant="outlined"
+                      />
+                      <Chip
+                        icon={getStatusIcon(user.status || "ACTIVE")}
+                        label={user.status || "ACTIVE"}
+                        color={getStatusColor(user.status || "ACTIVE")}
+                        size="small"
+                      />
+                    </Box>
+
+                    <Divider sx={{ my: 2 }} />
+
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Joined: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
+                      </Typography>
+                      <Box sx={{ display: "flex", gap: 1 }}>
+                        <Tooltip title="View Details">
+                          <IconButton size="small" color="primary">
+                            <ViewIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Edit User">
+                          <IconButton size="small" color="primary">
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Toggle Status">
+                          <IconButton
+                            size="small"
+                            color={user.status === "ACTIVE" ? "warning" : "success"}
+                            onClick={() => handleToggleStatus(user.id, user.status || "ACTIVE")}
+                          >
+                            <SecurityIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete User">
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </Box>
+        ) : (
+          <Card sx={spacing.card}>
+            <CardContent>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                User List ({filteredUsers.length})
+              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {filteredUsers.length === 0 ? (
+                  <Typography color="text.secondary" sx={{ textAlign: "center", py: 4 }}>
+                    {searchTerm || roleFilter !== "all" || statusFilter !== "all"
+                      ? "No users match your filters"
+                      : "No users found"}
+                  </Typography>
+                ) : (
+                  filteredUsers.map((user) => (
+                    <Card key={user.id} variant="outlined" sx={{ p: 2 }}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Avatar src={user.image || undefined}>
+                          {getRoleIcon(user.role || "USER")}
+                        </Avatar>
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="subtitle1" fontWeight={600}>
                             {user.name || "No Name"}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
                           <Typography variant="body2" color="text.secondary">
                             {user.email || "No Email"}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
+                        </Box>
+                        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                           <Chip
                             label={user.role || "USER"}
                             color={getRoleColor(user.role || "USER")}
                             size="small"
                             variant="outlined"
                           />
-                        </TableCell>
-                        <TableCell>
                           <Chip
                             label={user.status || "ACTIVE"}
                             color={getStatusColor(user.status || "ACTIVE")}
                             size="small"
                           />
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" color="text.secondary">
-                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Box sx={{ display: "flex", gap: 1 }}>
-                            <IconButton size="small" color="primary">
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => handleDeleteUser(user.id)}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </CardContent>
-        </Card>
+                          <IconButton size="small" color="primary">
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    </Card>
+                  ))
+                )}
+              </Box>
+            </CardContent>
+          </Card>
+        )}
       </TabContent>
     </AdminLayout>
   );
