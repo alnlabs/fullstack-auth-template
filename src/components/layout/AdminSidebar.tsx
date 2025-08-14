@@ -16,6 +16,7 @@ import {
   People as PeopleIcon,
   Assessment as AssessmentIcon,
   Security as SecurityIcon,
+  Settings as SettingsIcon,
 } from "@mui/icons-material";
 
 interface AdminSidebarProps {
@@ -29,6 +30,7 @@ const menuItems = [
   { text: "Users", icon: PeopleIcon, path: "/admin/users" },
   { text: "Analytics", icon: AssessmentIcon, path: "/admin/analytics" },
   { text: "Security", icon: SecurityIcon, path: "/admin/security" },
+  { text: "Settings", icon: SettingsIcon, path: "/admin/settings" },
 ];
 
 export default function AdminSidebar({ open, drawerWidth, collapsedWidth }: AdminSidebarProps) {

@@ -63,7 +63,13 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
         <IconButton
           color="inherit"
           onClick={onMenuClick}
-          sx={{ mr: 2, display: { sm: "block" } }}
+          sx={{
+            mr: 2,
+            display: { sm: "block" },
+            alignSelf: "center",
+            height: 40,
+            width: 40,
+          }}
         >
           <MenuIcon />
         </IconButton>
