@@ -27,7 +27,8 @@ export default function HomePage() {
   const features = [
     {
       title: "Authentication",
-      description: "Secure login with email/password and role-based access control",
+      description:
+        "Secure login with email/password and role-based access control",
       icon: "🔐",
     },
     {
@@ -88,13 +89,23 @@ export default function HomePage() {
           Welcome to MyMentor
         </Typography>
         <Typography variant="h5" color="text.secondary" mb={4}>
-          A comprehensive interview platform with advanced authentication and user management
+          A comprehensive interview platform with advanced authentication and
+          user management
         </Typography>
 
         {user ? (
           <Box>
-            <Box display="flex" alignItems="center" justifyContent="center" gap={2} mb={3}>
-              <Avatar src={user.image || undefined} sx={{ width: 64, height: 64 }}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              gap={2}
+              mb={3}
+            >
+              <Avatar
+                src={user.image || undefined}
+                sx={{ width: 64, height: 64 }}
+              >
                 {user.name?.charAt(0)}
               </Avatar>
               <Box textAlign="left">
@@ -112,7 +123,13 @@ export default function HomePage() {
               <Button
                 variant="contained"
                 size="large"
-                startIcon={user.role === "ADMIN" || user.role === "SUPERADMIN" ? <AdminIcon /> : <DashboardIcon />}
+                startIcon={
+                  user.role === "ADMIN" || user.role === "SUPERADMIN" ? (
+                    <AdminIcon />
+                  ) : (
+                    <DashboardIcon />
+                  )
+                }
                 onClick={() =>
                   router.push(
                     user.role === "ADMIN" || user.role === "SUPERADMIN"
@@ -155,7 +172,18 @@ export default function HomePage() {
       </Box>
 
       {/* Features Grid */}
-      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }, gap: 4, mb: 8 }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            md: "repeat(2, 1fr)",
+            lg: "repeat(3, 1fr)",
+          },
+          gap: 4,
+          mb: 8,
+        }}
+      >
         {features.map((feature, index) => (
           <Card key={index} sx={{ height: "100%" }}>
             <CardContent sx={{ textAlign: "center", p: 3 }}>
@@ -179,7 +207,17 @@ export default function HomePage() {
           <Typography variant="h5" gutterBottom textAlign="center">
             Built With Modern Technologies
           </Typography>
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" }, gap: 3 }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+              },
+              gap: 3,
+            }}
+          >
             {[
               { name: "Next.js 14", desc: "React framework with App Router" },
               { name: "TypeScript", desc: "Type safety and better DX" },
@@ -208,7 +246,8 @@ export default function HomePage() {
             Ready to Get Started?
           </Typography>
           <Typography color="text.secondary" mb={3}>
-            Join thousands of users who trust MyMentor for their interview platform needs.
+            Join thousands of users who trust MyMentor for their interview
+            platform needs.
           </Typography>
           <Box display="flex" gap={2} justifyContent="center">
             <Button

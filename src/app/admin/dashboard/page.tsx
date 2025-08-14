@@ -25,7 +25,7 @@ import {
   People as PeopleIcon,
   Assessment as AssessmentIcon,
   Security as SecurityIcon,
-  Storage as StorageIcon,
+
   AdminPanelSettings as AdminIcon,
 } from "@mui/icons-material";
 import { AdminOnly } from "@/lib/route-guard";
@@ -118,7 +118,7 @@ export default function AdminDashboardPage() {
 
         {/* Admin Quick Actions */}
         <Grid container spacing={3} mb={4}>
-          <Grid xs={12} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
                 <PeopleIcon
@@ -140,7 +140,7 @@ export default function AdminDashboardPage() {
             </Card>
           </Grid>
 
-          <Grid xs={12} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
                 <AssessmentIcon
@@ -162,7 +162,7 @@ export default function AdminDashboardPage() {
             </Card>
           </Grid>
 
-          <Grid xs={12} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
                 <SecurityIcon
@@ -183,6 +183,8 @@ export default function AdminDashboardPage() {
               </CardContent>
             </Card>
           </Grid>
+
+
         </Grid>
 
         {/* System Status */}
@@ -193,7 +195,7 @@ export default function AdminDashboardPage() {
             </Typography>
             <Divider sx={{ mb: 2 }} />
             <Grid container spacing={2}>
-              <Grid xs={12} md={6}>
+              <Grid item xs={12} md={6}>
                 <List>
                   <ListItem>
                     <ListItemIcon>
@@ -215,7 +217,7 @@ export default function AdminDashboardPage() {
                   </ListItem>
                 </List>
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid item xs={12} md={6}>
                 <List>
                   <ListItem>
                     <ListItemIcon>
