@@ -42,7 +42,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <Toolbar />
           <Box
             sx={{
-              p: 1,
               width: 1, // This is 100% according to MUI System
               maxWidth: "none",
             }}
