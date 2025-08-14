@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/lib/auth-context";
-import { Grid, Typography, Box } from "@mui/material";
+import { Grid } from "@mui/material";
 import {
   People as PeopleIcon,
   Assessment as AssessmentIcon,
@@ -15,21 +15,12 @@ import PageHeader from "@/components/widgets/PageHeader";
 export default function AdminDashboardPage() {
   const { user } = useAuth();
 
-  console.log("Dashboard: user =", user);
-
   if (!user) {
-    console.log("Dashboard: No user, returning null");
     return null;
   }
 
   return (
     <AdminLayout>
-      <Box sx={{ backgroundColor: "red", p: 2, mb: 2 }}>
-        <Typography variant="h1" color="white">
-          DASHBOARD IS LOADING!
-        </Typography>
-      </Box>
-      
       <PageHeader
         title="Dashboard"
         subtitle="Welcome back! Here's what's happening with your system."
