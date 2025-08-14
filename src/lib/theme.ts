@@ -11,9 +11,7 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: [
-      'Aleo',
-      'Georgia',
-      'serif',
+      'Mulish',
       '-apple-system',
       'BlinkMacSystemFont',
       '"Segoe UI"',
