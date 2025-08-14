@@ -222,10 +222,11 @@ export default function AdminUsersPage() {
             gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
             gap: 1.5,
             mb: 3,
+            p: 2,
           }}
         >
-          <Card sx={{ ...spacing.card, height: "100%" }}>
-            <CardContent sx={{ textAlign: "center", py: 2, px: 1 }}>
+          <Card sx={{ ...spacing.card, height: "auto", minHeight: "80px" }}>
+            <CardContent sx={{ textAlign: "center", py: 1.5, px: 1 }}>
               <Typography variant="h5" color="primary" fontWeight={700}>
                 {stats.total}
               </Typography>
@@ -234,8 +235,8 @@ export default function AdminUsersPage() {
               </Typography>
             </CardContent>
           </Card>
-          <Card sx={{ ...spacing.card, height: "100%" }}>
-            <CardContent sx={{ textAlign: "center", py: 2, px: 1 }}>
+          <Card sx={{ ...spacing.card, height: "auto", minHeight: "80px" }}>
+            <CardContent sx={{ textAlign: "center", py: 1.5, px: 1 }}>
               <Typography variant="h5" color="success.main" fontWeight={700}>
                 {stats.active}
               </Typography>
@@ -244,8 +245,8 @@ export default function AdminUsersPage() {
               </Typography>
             </CardContent>
           </Card>
-          <Card sx={{ ...spacing.card, height: "100%" }}>
-            <CardContent sx={{ textAlign: "center", py: 2, px: 1 }}>
+          <Card sx={{ ...spacing.card, height: "auto", minHeight: "80px" }}>
+            <CardContent sx={{ textAlign: "center", py: 1.5, px: 1 }}>
               <Typography variant="h5" color="warning.main" fontWeight={700}>
                 {stats.admins}
               </Typography>
@@ -254,8 +255,8 @@ export default function AdminUsersPage() {
               </Typography>
             </CardContent>
           </Card>
-          <Card sx={{ ...spacing.card, height: "100%" }}>
-            <CardContent sx={{ textAlign: "center", py: 2, px: 1 }}>
+          <Card sx={{ ...spacing.card, height: "auto", minHeight: "80px" }}>
+            <CardContent sx={{ textAlign: "center", py: 1.5, px: 1 }}>
               <Typography variant="h5" color="error.main" fontWeight={700}>
                 {stats.suspended}
               </Typography>
