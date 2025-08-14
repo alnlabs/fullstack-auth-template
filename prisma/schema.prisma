@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPERADMIN
+  ADMIN
+  USER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+  FACEBOOK
+  GITHUB
+}
+
+model User {
+  id                    String      @id @default(cuid())
+  email                 String      @unique
+  username              String?     @unique
+  firstName             String?
+  lastName              String?
+  displayName           String?
+  avatar                String?
+  bio                   String?
+  phone                 String?
+  dateOfBirth           DateTime?
+  gender                String?
+  location              String?
+  timezone              String?
+  language              String      @default("en")
+  currency              String      @default("USD")
+
+  // Authentication fields
+  password              String?
+  emailVerified         Boolean     @default(false)
+  emailVerificationToken String?
+  emailVerificationExpires DateTime?
+  passwordResetToken    String?
+  passwordResetExpires  DateTime?
+  lastLoginAt           DateTime?
+  loginAttempts         Int         @default(0)
+  lockedUntil           DateTime?
+
+  // Role and status
+  role                  UserRole    @default(USER)
+  status                UserStatus  @default(PENDING_VERIFICATION)
+
+  // OAuth fields
+  authProvider          AuthProvider @default(LOCAL)
+  providerId            String?
+  providerData          Json?
+
+  // Profile fields
+  website               String?
+  socialLinks           Json?
+  preferences           Json?
+
+  // Timestamps
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  lastActiveAt          DateTime?
+
+  // Relations
+  sessions              Session[]
+  refreshTokens         RefreshToken[]
+  userLogs              UserLog[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model RefreshToken {
+  id          String   @id @default(cuid())
+  token       String   @unique
+  userId      String
+  expires     DateTime
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model UserLog {
+  id          String   @id @default(cuid())
+  userId      String
+  action      String
+  details     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_logs")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}

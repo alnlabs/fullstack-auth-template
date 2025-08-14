@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: mymentor-postgres-test
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mymentor_db_test
+      POSTGRES_USER: mymentor_user
+      POSTGRES_PASSWORD: mymentor_password_test
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_test:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mymentor-network-test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mymentor_user -d mymentor_db_test"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis-test:
+    image: redis:7-alpine
+    container_name: mymentor-redis-test
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data_test:/data
+    networks:
+      - mymentor-network-test
+    command: redis-server --appendonly yes
+
+  mailhog-test:
+    image: mailhog/mailhog:latest
+    container_name: mymentor-mailhog-test
+    restart: unless-stopped
+    ports:
+      - "1026:1025" # SMTP
+      - "8026:8025" # Web UI
+    networks:
+      - mymentor-network-test
+
+  # Test runner service
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: mymentor-test-runner
+    environment:
+      DATABASE_URL: postgresql://mymentor_user:mymentor_password_test@postgres-test:5432/mymentor_db_test
+      REDIS_URL: redis://redis-test:6379
+      NODE_ENV: test
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - mymentor-network-test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_started
+    command: npm run test
+
+volumes:
+  postgres_data_test:
+    driver: local
+  redis_data_test:
+    driver: local
+
+networks:
+  mymentor-network-test:
+    driver: bridge

@@ -1,0 +1,75 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: mymentor-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: mymentor_db_dev
+      POSTGRES_USER: mymentor_user
+      POSTGRES_PASSWORD: mymentor_password_dev
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mymentor-network-dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mymentor_user -d mymentor_db_dev"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: mymentor-pgadmin-dev
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@mymentor.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data_dev:/var/lib/pgadmin
+    networks:
+      - mymentor-network-dev
+    depends_on:
+      - postgres
+
+  redis:
+    image: redis:7-alpine
+    container_name: mymentor-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_dev:/data
+    networks:
+      - mymentor-network-dev
+    command: redis-server --appendonly yes
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mymentor-mailhog-dev
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
+    networks:
+      - mymentor-network-dev
+
+volumes:
+  postgres_data_dev:
+    driver: local
+  pgadmin_data_dev:
+    driver: local
+  redis_data_dev:
+    driver: local
+
+networks:
+  mymentor-network-dev:
+    driver: bridge
