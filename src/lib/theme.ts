@@ -45,19 +45,22 @@ export const theme = createTheme({
   shape: {
     borderRadius: 8,
   },
+  spacing: 8, // Base spacing unit
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
           borderRadius: 8,
-          padding: "10px 24px",
+          padding: "12px 32px",
           fontWeight: 600,
+          fontSize: "1rem",
         },
       },
     },
     MuiTextField: {
       styleOverrides: {
         root: {
+          marginBottom: 16,
           "& .MuiOutlinedInput-root": {
             borderRadius: 8,
           },
@@ -69,6 +72,25 @@ export const theme = createTheme({
         root: {
           borderRadius: 12,
           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          padding: 8,
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: 32,
+          "&:last-child": {
+            paddingBottom: 32,
+          },
+        },
+      },
+    },
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          paddingTop: 32,
+          paddingBottom: 32,
         },
       },
     },

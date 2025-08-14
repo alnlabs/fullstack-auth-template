@@ -19,6 +19,7 @@ import {
   Settings as SettingsIcon,
   Upload as UploadIcon,
 } from "@mui/icons-material";
+import { spacing } from "@/lib/spacing";
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
@@ -46,14 +47,9 @@ export default function DashboardPage() {
 
   return (
     <AuthenticatedOnly>
-      <Box sx={{ p: 4, width: 1, maxWidth: "none", overflow: "hidden" }}>
+      <Box sx={spacing.pageContainer}>
         {/* Header */}
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={6}
-        >
+        <Box sx={spacing.header}>
           <Typography variant="h3" component="h1" fontWeight={700}>
             Dashboard
           </Typography>
@@ -79,12 +75,12 @@ export default function DashboardPage() {
         </Box>
 
         {/* User Info Card */}
-        <Card sx={{ mb: 6, p: 1 }}>
-          <CardContent sx={{ p: 4 }}>
-            <Box display="flex" alignItems="center" gap={4}>
+        <Card sx={{ ...spacing.card, ...spacing.sectionSpacing }}>
+          <CardContent>
+            <Box sx={spacing.userInfo}>
               <Avatar
                 src={user.image || undefined}
-                sx={{ width: 100, height: 100 }}
+                sx={spacing.avatar}
               >
                 <PersonIcon sx={{ fontSize: 50 }} />
               </Avatar>
@@ -92,14 +88,19 @@ export default function DashboardPage() {
                 <Typography variant="h4" gutterBottom fontWeight={600}>
                   Welcome, {user.name || "User"}!
                 </Typography>
-                <Typography color="text.secondary" gutterBottom variant="h6" mb={2}>
+                <Typography
+                  color="text.secondary"
+                  gutterBottom
+                  variant="h6"
+                  mb={2}
+                >
                   {user.email}
                 </Typography>
                 <Chip
                   label={user.role || "USER"}
                   color={getRoleColor(user.role || "USER")}
                   size="medium"
-                  sx={{ fontSize: "1rem", px: 2, py: 1 }}
+                  sx={spacing.chip}
                 />
               </Box>
             </Box>
@@ -107,22 +108,14 @@ export default function DashboardPage() {
         </Card>
 
         {/* Quick Actions */}
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 3,
-            mb: 6,
-            width: 1,
-          }}
-        >
-          <Box sx={{ flex: "1 1 280px", minWidth: "280px" }}>
-            <Card sx={{ height: "100%", p: 1 }}>
-              <CardContent sx={{ textAlign: "center", p: 4 }}>
+        <Box sx={spacing.cardGrid}>
+          <Box sx={spacing.cardItem}>
+            <Card sx={spacing.card}>
+              <CardContent sx={spacing.cardContent}>
                 <PersonIcon
-                  sx={{ fontSize: 56, color: "primary.main", mb: 3 }}
+                  sx={{ ...spacing.icon, color: "primary.main" }}
                 />
-                <Typography variant="h5" gutterBottom fontWeight={600}>
+                <Typography variant="h5" sx={spacing.title}>
                   Edit Profile
                 </Typography>
                 <Typography color="text.secondary" mb={3} variant="body1">
@@ -131,8 +124,7 @@ export default function DashboardPage() {
                 <Button
                   variant="contained"
                   onClick={() => router.push("/profile")}
-                  size="large"
-                  sx={{ px: 4, py: 1.5 }}
+                  {...spacing.button}
                 >
                   Edit
                 </Button>
@@ -140,13 +132,13 @@ export default function DashboardPage() {
             </Card>
           </Box>
 
-          <Box sx={{ flex: "1 1 280px", minWidth: "280px" }}>
-            <Card sx={{ height: "100%", p: 1 }}>
-              <CardContent sx={{ textAlign: "center", p: 4 }}>
+          <Box sx={spacing.cardItem}>
+            <Card sx={spacing.card}>
+              <CardContent sx={spacing.cardContent}>
                 <UploadIcon
-                  sx={{ fontSize: 56, color: "primary.main", mb: 3 }}
+                  sx={{ ...spacing.icon, color: "primary.main" }}
                 />
-                <Typography variant="h5" gutterBottom fontWeight={600}>
+                <Typography variant="h5" sx={spacing.title}>
                   Upload Files
                 </Typography>
                 <Typography color="text.secondary" mb={3} variant="body1">
@@ -155,8 +147,7 @@ export default function DashboardPage() {
                 <Button
                   variant="contained"
                   onClick={() => router.push("/upload")}
-                  size="large"
-                  sx={{ px: 4, py: 1.5 }}
+                  {...spacing.button}
                 >
                   Upload
                 </Button>
@@ -164,13 +155,13 @@ export default function DashboardPage() {
             </Card>
           </Box>
 
-          <Box sx={{ flex: "1 1 280px", minWidth: "280px" }}>
-            <Card sx={{ height: "100%", p: 1 }}>
-              <CardContent sx={{ textAlign: "center", p: 4 }}>
+          <Box sx={spacing.cardItem}>
+            <Card sx={spacing.card}>
+              <CardContent sx={spacing.cardContent}>
                 <SettingsIcon
-                  sx={{ fontSize: 56, color: "primary.main", mb: 3 }}
+                  sx={{ ...spacing.icon, color: "primary.main" }}
                 />
-                <Typography variant="h5" gutterBottom fontWeight={600}>
+                <Typography variant="h5" sx={spacing.title}>
                   Settings
                 </Typography>
                 <Typography color="text.secondary" mb={3} variant="body1">
@@ -179,8 +170,7 @@ export default function DashboardPage() {
                 <Button
                   variant="contained"
                   onClick={() => router.push("/settings")}
-                  size="large"
-                  sx={{ px: 4, py: 1.5 }}
+                  {...spacing.button}
                 >
                   Settings
                 </Button>
@@ -188,11 +178,11 @@ export default function DashboardPage() {
             </Card>
           </Box>
 
-          <Box sx={{ flex: "1 1 280px", minWidth: "280px" }}>
-            <Card sx={{ height: "100%", p: 1 }}>
-              <CardContent sx={{ textAlign: "center", p: 4 }}>
-                <LogoutIcon sx={{ fontSize: 56, color: "error.main", mb: 3 }} />
-                <Typography variant="h5" gutterBottom fontWeight={600}>
+          <Box sx={spacing.cardItem}>
+            <Card sx={spacing.card}>
+              <CardContent sx={spacing.cardContent}>
+                <LogoutIcon sx={{ ...spacing.icon, color: "error.main" }} />
+                <Typography variant="h5" sx={spacing.title}>
                   Logout
                 </Typography>
                 <Typography color="text.secondary" mb={3} variant="body1">
@@ -202,8 +192,7 @@ export default function DashboardPage() {
                   variant="contained"
                   color="error"
                   onClick={handleLogout}
-                  size="large"
-                  sx={{ px: 4, py: 1.5 }}
+                  {...spacing.button}
                 >
                   Logout
                 </Button>
@@ -213,9 +202,9 @@ export default function DashboardPage() {
         </Box>
 
         {/* Recent Activity */}
-        <Card sx={{ p: 1 }}>
-          <CardContent sx={{ p: 4 }}>
-            <Typography variant="h5" gutterBottom fontWeight={600} mb={3}>
+        <Card sx={spacing.card}>
+          <CardContent>
+            <Typography variant="h5" sx={spacing.title}>
               Recent Activity
             </Typography>
             <Divider sx={{ mb: 3 }} />
