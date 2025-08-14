@@ -10,7 +10,6 @@ import {
 } from "@mui/icons-material";
 import AdminLayout from "@/components/layout/AdminLayout";
 import StatCard from "@/components/widgets/StatCard";
-import PageHeader from "@/components/widgets/PageHeader";
 
 export default function AdminDashboardPage() {
   const { user } = useAuth();
@@ -27,11 +26,6 @@ export default function AdminDashboardPage() {
           maxWidth: "none",
         }}
       >
-        <PageHeader
-          title="Dashboard"
-          subtitle="Welcome back! Here's what's happening with your system."
-        />
-
         {/* Stats Grid */}
         <Box
           sx={{
