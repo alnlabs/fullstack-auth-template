@@ -53,10 +53,6 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  if (!user) {
-    return null;
-  }
-
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -117,12 +113,13 @@ export default function AdminUsersPage() {
   };
 
   const filteredUsers = users.filter((user) => {
-    const matchesSearch = 
+    const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
-    const matchesStatus = statusFilter === "all" || user.status === statusFilter;
-    
+    const matchesStatus =
+      statusFilter === "all" || user.status === statusFilter;
+
     return matchesSearch && matchesRole && matchesStatus;
   });
 
@@ -131,6 +128,10 @@ export default function AdminUsersPage() {
       Add User
     </Button>
   );
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <AdminLayout>
@@ -145,8 +146,15 @@ export default function AdminUsersPage() {
             <Typography variant="h5" sx={spacing.title}>
               Search & Filters
             </Typography>
-            
-            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", alignItems: "center" }}>
+
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
               <TextField
                 placeholder="Search users..."
                 value={searchTerm}
@@ -161,7 +169,7 @@ export default function AdminUsersPage() {
                   ),
                 }}
               />
-              
+
               <FormControl size="small" sx={{ minWidth: 120 }}>
                 <InputLabel>Role</InputLabel>
                 <Select
@@ -175,7 +183,7 @@ export default function AdminUsersPage() {
                   <MenuItem value="SUPERADMIN">Super Admin</MenuItem>
                 </Select>
               </FormControl>
-              
+
               <FormControl size="small" sx={{ minWidth: 120 }}>
                 <InputLabel>Status</InputLabel>
                 <Select
@@ -196,12 +204,19 @@ export default function AdminUsersPage() {
         {/* Users Table */}
         <Card sx={spacing.card}>
           <CardContent>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 3,
+              }}
+            >
               <Typography variant="h5" sx={spacing.title}>
                 All Users ({filteredUsers.length})
               </Typography>
-              <Chip 
-                icon={<FilterIcon />} 
+              <Chip
+                icon={<FilterIcon />}
                 label={`${filteredUsers.length} of ${users.length} users`}
                 variant="outlined"
                 size="small"
@@ -225,8 +240,10 @@ export default function AdminUsersPage() {
                     <TableRow>
                       <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                         <Typography color="text.secondary">
-                          {searchTerm || roleFilter !== "all" || statusFilter !== "all" 
-                            ? "No users match your filters" 
+                          {searchTerm ||
+                          roleFilter !== "all" ||
+                          statusFilter !== "all"
+                            ? "No users match your filters"
                             : "No users found"}
                         </Typography>
                       </TableCell>
