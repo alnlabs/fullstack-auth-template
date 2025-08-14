@@ -25,9 +25,6 @@ export default function AdminDashboardPage() {
         sx={{
           width: 1, // This is 100% according to MUI System
           maxWidth: "none",
-          backgroundColor: "yellow",
-          border: "2px solid red",
-          minHeight: "100px",
         }}
       >
         <PageHeader
