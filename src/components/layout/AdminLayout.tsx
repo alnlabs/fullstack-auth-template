@@ -39,10 +39,20 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             transition: "margin-left 0.2s",
             width: `calc(100vw - ${sidebarOpen ? drawerWidth : collapsedDrawerWidth}px)`,
             maxWidth: "none",
+            backgroundColor: "lightblue",
+            border: "3px solid green",
           }}
         >
           <Toolbar />
-          <Box sx={{ p: 1, width: "100%", maxWidth: "none" }}>
+          <Box 
+            sx={{ 
+              p: 1, 
+              width: "100%", 
+              maxWidth: "none",
+              backgroundColor: "pink",
+              border: "3px solid purple",
+            }}
+          >
             {children}
           </Box>
         </Box>
