@@ -68,7 +68,7 @@ setup_environment() {
     print_info "Setting up environment..."
 
     if [ ! -f .env.local ]; then
-        cp env.development .env.local
+        cp env.example .env.local
         print_status "Environment file created (.env.local)"
         print_warning "Please update .env.local with your configuration"
     else

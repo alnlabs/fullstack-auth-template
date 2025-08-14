@@ -77,7 +77,7 @@ npm install
 ### 3. Environment Setup
 Copy the environment template and configure your variables:
 ```bash
-cp env.development .env.local
+cp env.example .env.local
 ```
 
 **Required Environment Variables:**

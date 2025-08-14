@@ -68,7 +68,7 @@ cd fullstack-auth-template
 npm install
 
 # Copy environment template
-cp env.development .env.local
+cp env.example .env.local
 
 # Start development environment
 ./scripts/docker-dev.sh start
