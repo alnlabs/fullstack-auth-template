@@ -106,14 +106,18 @@ export default function AdminUsersPage() {
   };
 
   const rightControls = (
-    <Button variant="contained" startIcon={<AddIcon />} {...spacing.button}>
+    <Button variant="contained" startIcon={<AddIcon />} size="medium">
       Add User
     </Button>
   );
 
   return (
     <AdminLayout>
-      <TabContent rightControls={rightControls}>
+      <TabContent
+        title="User Management"
+        subtitle="Manage users, roles, and permissions"
+        rightControls={rightControls}
+      >
         {/* Users Table */}
         <Card sx={spacing.card}>
           <CardContent>
