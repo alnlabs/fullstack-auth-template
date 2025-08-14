@@ -46,15 +46,15 @@ export default function DashboardPage() {
 
   return (
     <AuthenticatedOnly>
-      <Box sx={{ p: 3, width: 1, maxWidth: "none", overflow: "hidden" }}>
+      <Box sx={{ p: 4, width: 1, maxWidth: "none", overflow: "hidden" }}>
         {/* Header */}
         <Box
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          mb={4}
+          mb={6}
         >
-          <Typography variant="h4" component="h1">
+          <Typography variant="h3" component="h1" fontWeight={700}>
             Dashboard
           </Typography>
           <Box display="flex" gap={2}>
@@ -62,6 +62,7 @@ export default function DashboardPage() {
               variant="outlined"
               startIcon={<SettingsIcon />}
               onClick={() => router.push("/profile")}
+              size="large"
             >
               Profile
             </Button>
@@ -70,6 +71,7 @@ export default function DashboardPage() {
               color="error"
               startIcon={<LogoutIcon />}
               onClick={handleLogout}
+              size="large"
             >
               Logout
             </Button>
@@ -77,26 +79,27 @@ export default function DashboardPage() {
         </Box>
 
         {/* User Info Card */}
-        <Card sx={{ mb: 4 }}>
-          <CardContent>
-            <Box display="flex" alignItems="center" gap={3}>
+        <Card sx={{ mb: 6, p: 1 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Box display="flex" alignItems="center" gap={4}>
               <Avatar
                 src={user.image || undefined}
-                sx={{ width: 80, height: 80 }}
+                sx={{ width: 100, height: 100 }}
               >
-                <PersonIcon sx={{ fontSize: 40 }} />
+                <PersonIcon sx={{ fontSize: 50 }} />
               </Avatar>
               <Box flex={1}>
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h4" gutterBottom fontWeight={600}>
                   Welcome, {user.name || "User"}!
                 </Typography>
-                <Typography color="text.secondary" gutterBottom>
+                <Typography color="text.secondary" gutterBottom variant="h6" mb={2}>
                   {user.email}
                 </Typography>
                 <Chip
                   label={user.role || "USER"}
                   color={getRoleColor(user.role || "USER")}
-                  size="small"
+                  size="medium"
+                  sx={{ fontSize: "1rem", px: 2, py: 1 }}
                 />
               </Box>
             </Box>
@@ -108,26 +111,28 @@ export default function DashboardPage() {
           sx={{
             display: "flex",
             flexWrap: "wrap",
-            gap: 2,
-            mb: 4,
+            gap: 3,
+            mb: 6,
             width: 1,
           }}
         >
-          <Box sx={{ flex: "1 1 250px", minWidth: "250px" }}>
-            <Card>
-              <CardContent sx={{ textAlign: "center" }}>
+          <Box sx={{ flex: "1 1 280px", minWidth: "280px" }}>
+            <Card sx={{ height: "100%", p: 1 }}>
+              <CardContent sx={{ textAlign: "center", p: 4 }}>
                 <PersonIcon
-                  sx={{ fontSize: 48, color: "primary.main", mb: 2 }}
+                  sx={{ fontSize: 56, color: "primary.main", mb: 3 }}
                 />
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h5" gutterBottom fontWeight={600}>
                   Edit Profile
                 </Typography>
-                <Typography color="text.secondary" mb={2}>
+                <Typography color="text.secondary" mb={3} variant="body1">
                   Update your personal information
                 </Typography>
                 <Button
                   variant="contained"
                   onClick={() => router.push("/profile")}
+                  size="large"
+                  sx={{ px: 4, py: 1.5 }}
                 >
                   Edit
                 </Button>
@@ -135,21 +140,23 @@ export default function DashboardPage() {
             </Card>
           </Box>
 
-          <Box sx={{ flex: "1 1 250px", minWidth: "250px" }}>
-            <Card>
-              <CardContent sx={{ textAlign: "center" }}>
+          <Box sx={{ flex: "1 1 280px", minWidth: "280px" }}>
+            <Card sx={{ height: "100%", p: 1 }}>
+              <CardContent sx={{ textAlign: "center", p: 4 }}>
                 <UploadIcon
-                  sx={{ fontSize: 48, color: "primary.main", mb: 2 }}
+                  sx={{ fontSize: 56, color: "primary.main", mb: 3 }}
                 />
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h5" gutterBottom fontWeight={600}>
                   Upload Files
                 </Typography>
-                <Typography color="text.secondary" mb={2}>
+                <Typography color="text.secondary" mb={3} variant="body1">
                   Upload documents and files
                 </Typography>
                 <Button
                   variant="contained"
                   onClick={() => router.push("/upload")}
+                  size="large"
+                  sx={{ px: 4, py: 1.5 }}
                 >
                   Upload
                 </Button>
@@ -157,21 +164,23 @@ export default function DashboardPage() {
             </Card>
           </Box>
 
-          <Box sx={{ flex: "1 1 250px", minWidth: "250px" }}>
-            <Card>
-              <CardContent sx={{ textAlign: "center" }}>
+          <Box sx={{ flex: "1 1 280px", minWidth: "280px" }}>
+            <Card sx={{ height: "100%", p: 1 }}>
+              <CardContent sx={{ textAlign: "center", p: 4 }}>
                 <SettingsIcon
-                  sx={{ fontSize: 48, color: "primary.main", mb: 2 }}
+                  sx={{ fontSize: 56, color: "primary.main", mb: 3 }}
                 />
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h5" gutterBottom fontWeight={600}>
                   Settings
                 </Typography>
-                <Typography color="text.secondary" mb={2}>
+                <Typography color="text.secondary" mb={3} variant="body1">
                   Manage your account settings
                 </Typography>
                 <Button
                   variant="contained"
                   onClick={() => router.push("/settings")}
+                  size="large"
+                  sx={{ px: 4, py: 1.5 }}
                 >
                   Settings
                 </Button>
@@ -179,20 +188,22 @@ export default function DashboardPage() {
             </Card>
           </Box>
 
-          <Box sx={{ flex: "1 1 250px", minWidth: "250px" }}>
-            <Card>
-              <CardContent sx={{ textAlign: "center" }}>
-                <LogoutIcon sx={{ fontSize: 48, color: "error.main", mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
+          <Box sx={{ flex: "1 1 280px", minWidth: "280px" }}>
+            <Card sx={{ height: "100%", p: 1 }}>
+              <CardContent sx={{ textAlign: "center", p: 4 }}>
+                <LogoutIcon sx={{ fontSize: 56, color: "error.main", mb: 3 }} />
+                <Typography variant="h5" gutterBottom fontWeight={600}>
                   Logout
                 </Typography>
-                <Typography color="text.secondary" mb={2}>
+                <Typography color="text.secondary" mb={3} variant="body1">
                   Sign out of your account
                 </Typography>
                 <Button
                   variant="contained"
                   color="error"
                   onClick={handleLogout}
+                  size="large"
+                  sx={{ px: 4, py: 1.5 }}
                 >
                   Logout
                 </Button>
@@ -202,13 +213,13 @@ export default function DashboardPage() {
         </Box>
 
         {/* Recent Activity */}
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
+        <Card sx={{ p: 1 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Typography variant="h5" gutterBottom fontWeight={600} mb={3}>
               Recent Activity
             </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Typography color="text.secondary">
+            <Divider sx={{ mb: 3 }} />
+            <Typography color="text.secondary" variant="body1">
               No recent activity to display.
             </Typography>
           </CardContent>
