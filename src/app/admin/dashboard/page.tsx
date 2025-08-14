@@ -21,10 +21,7 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <TabContent
-        title="Admin Dashboard"
-        subtitle="Overview of system statistics and performance"
-      >
+      <TabContent>
         {/* Stats Grid */}
         <Box
           sx={{
