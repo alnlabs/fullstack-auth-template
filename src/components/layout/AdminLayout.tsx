@@ -1,8 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import { Box, Toolbar, IconButton } from "@mui/material";
-import { Menu as MenuIcon } from "@mui/icons-material";
+import { Box, Toolbar } from "@mui/material";
 import { AdminOnly } from "@/lib/route-guard";
 import AdminHeader from "./AdminHeader";
 import AdminSidebar from "./AdminSidebar";
@@ -23,7 +22,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <AdminOnly>
-      <Box className="admin-layout" sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", height: "100vh", width: "100vw" }}>
         <AdminHeader onMenuClick={toggleSidebar} />
         <AdminSidebar
           open={sidebarOpen}
@@ -33,27 +32,22 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
         <Box
           component="main"
-          className="admin-content"
           sx={{
-            flexGrow: 1,
-            width: {
-              sm: `calc(100vw - ${
-                sidebarOpen ? drawerWidth : collapsedDrawerWidth
-              }px)`,
-            },
-            ml: {
-              sm: `${sidebarOpen ? drawerWidth : collapsedDrawerWidth}px`,
-            },
+            flex: 1,
+            height: "100vh",
+            width: `calc(100vw - ${sidebarOpen ? drawerWidth : collapsedDrawerWidth}px)`,
+            marginLeft: `${sidebarOpen ? drawerWidth : collapsedDrawerWidth}px`,
             transition: "width 0.2s, margin-left 0.2s",
             display: "flex",
             flexDirection: "column",
+            overflow: "hidden",
           }}
         >
           <Toolbar /> {/* Spacer for AppBar */}
-          <Box 
-            sx={{ 
-              flex: 1, 
-              p: 3, 
+          <Box
+            sx={{
+              flex: 1,
+              p: 3,
               overflow: "auto",
               width: "100%",
               height: "100%",

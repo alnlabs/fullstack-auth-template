@@ -23,14 +23,3 @@ html, body {
 #__next {
   height: 100%;
 }
-
-/* Admin layout specific styles */
-.admin-layout {
-  height: 100vh;
-  overflow: hidden;
-}
-
-.admin-content {
-  height: 100%;
-  overflow: auto;
-}

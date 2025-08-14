@@ -58,12 +58,13 @@ export default function AdminSidebar({
         "& .MuiDrawer-paper": {
           width: open ? drawerWidth : collapsedWidth,
           boxSizing: "border-box",
-          top: "64px", // Account for AppBar height
+          top: "64px",
           height: "calc(100vh - 64px)",
           overflowX: "hidden",
           transition: "width 0.2s",
           position: "fixed",
           left: 0,
+          zIndex: 1200,
         },
       }}
     >
