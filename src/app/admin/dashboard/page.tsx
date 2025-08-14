@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/lib/auth-context";
-import { Grid, Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import {
   People as PeopleIcon,
   Assessment as AssessmentIcon,
@@ -21,13 +21,13 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <Box 
-        sx={{ 
-          width: "100%", 
+      <Box
+        sx={{
+          width: "100%",
           maxWidth: "none",
           backgroundColor: "yellow",
           border: "2px solid red",
-          minHeight: "100px"
+          minHeight: "100px",
         }}
       >
         <PageHeader
@@ -36,8 +36,8 @@ export default function AdminDashboardPage() {
         />
 
         {/* Stats Grid */}
-        <Grid container spacing={3} mb={4} sx={{ width: "100%" }}>
-          <Grid item xs={12} sm={6} md={3}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 4 }}>
+          <Box sx={{ flex: "1 1 200px", minWidth: "200px" }}>
             <StatCard
               title="Total Users"
               value="1,234"
@@ -45,8 +45,8 @@ export default function AdminDashboardPage() {
               color="primary"
               subtitle="+12% from last month"
             />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          </Box>
+          <Box sx={{ flex: "1 1 200px", minWidth: "200px" }}>
             <StatCard
               title="Active Sessions"
               value="89"
@@ -54,8 +54,8 @@ export default function AdminDashboardPage() {
               color="success"
               subtitle="Currently online"
             />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          </Box>
+          <Box sx={{ flex: "1 1 200px", minWidth: "200px" }}>
             <StatCard
               title="System Health"
               value="98%"
@@ -63,8 +63,8 @@ export default function AdminDashboardPage() {
               color="info"
               subtitle="All systems operational"
             />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          </Box>
+          <Box sx={{ flex: "1 1 200px", minWidth: "200px" }}>
             <StatCard
               title="Storage Used"
               value="2.4GB"
@@ -72,28 +72,28 @@ export default function AdminDashboardPage() {
               color="warning"
               subtitle="of 10GB total"
             />
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
 
         {/* Quick Actions */}
-        <Grid container spacing={3} sx={{ width: "100%" }}>
-          <Grid item xs={12} md={6}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+          <Box sx={{ flex: "1 1 300px", minWidth: "300px" }}>
             <StatCard
               title="Recent Activity"
               value="No recent activity"
               color="secondary"
               subtitle="System is running smoothly"
             />
-          </Grid>
-          <Grid item xs={12} md={6}>
+          </Box>
+          <Box sx={{ flex: "1 1 300px", minWidth: "300px" }}>
             <StatCard
               title="System Status"
               value="All Good"
               color="success"
               subtitle="Everything is working properly"
             />
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Box>
     </AdminLayout>
   );
