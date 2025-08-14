@@ -1,70 +1,36 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { AuthenticatedOnly } from "@/lib/route-guard";
+import { useAuth } from "@/lib/auth-context";
 import {
   Box,
-  Container,
   Typography,
-  TextField,
   Button,
   Card,
   CardContent,
+  TextField,
   Avatar,
-  Grid,
   Divider,
-  IconButton,
 } from "@mui/material";
-import {
-  Save as SaveIcon,
-  Edit as EditIcon,
-  PhotoCamera as PhotoCameraIcon,
-  ArrowBack as ArrowBackIcon,
-} from "@mui/icons-material";
-import { useAuth } from "@/lib/auth-context";
-import { AuthenticatedOnly } from "@/lib/route-guard";
-import { ToastUtils, ToastMessages } from "@/lib/toast";
+import { Person as PersonIcon } from "@mui/icons-material";
+import { spacing } from "@/lib/spacing";
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
-  const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    bio: user?.bio || "",
+  });
   const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    bio: "",
-    phone: "",
-    location: "",
-    company: "",
-    jobTitle: "",
-  });
-
-  // Update form data when user data is available
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        bio: user.bio || "",
-        phone: user.phone || "",
-        location: user.location || "",
-        company: user.company || "",
-        jobTitle: user.jobTitle || "",
-      });
-    }
-  }, [user]);
-
   if (!user) {
-    return null; // RouteGuard will handle the redirect
+    return null;
   }
 
   const handleSave = async () => {
     setLoading(true);
-
     try {
       const response = await fetch("/api/users/profile", {
         method: "PUT",
@@ -74,41 +40,20 @@ export default function ProfilePage() {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        ToastUtils.error(data.error || ToastMessages.profile.updateError);
-      } else {
-        ToastUtils.success(ToastMessages.profile.updateSuccess);
-        setIsEditing(false);
-        // Refresh user data
+      if (response.ok) {
         await refreshUser();
+        // Toast notifications are handled by the auth context
       }
     } catch (error) {
-      ToastUtils.error(ToastMessages.profile.updateError);
+      // Error handling is done by the auth context
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAvatarUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
-    // Validate file
-    if (file.size > 2 * 1024 * 1024) {
-      ToastUtils.error("File size must be less than 2MB");
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      ToastUtils.error("Please select an image file");
-      return;
-    }
-
-    setLoading(true);
 
     const formData = new FormData();
     formData.append("avatar", file);
@@ -119,222 +64,100 @@ export default function ProfilePage() {
         body: formData,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        ToastUtils.error(data.error || ToastMessages.profile.avatarUploadError);
-      } else {
-        ToastUtils.success(ToastMessages.profile.avatarUploadSuccess);
-        // Refresh user data
+      if (response.ok) {
         await refreshUser();
+        // Toast notifications are handled by the auth context
       }
     } catch (error) {
-      ToastUtils.error(ToastMessages.profile.avatarUploadError);
-    } finally {
-      setLoading(false);
+      // Error handling is done by the auth context
     }
   };
 
   return (
     <AuthenticatedOnly>
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Box sx={spacing.pageContainer}>
         {/* Header */}
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={4}
-        >
-          <Typography variant="h4" component="h1">
+        <Box sx={spacing.header}>
+          <Typography variant="h3" component="h1" fontWeight={700}>
             Profile
           </Typography>
-          <Button
-            startIcon={<ArrowBackIcon />}
-            onClick={() => router.push("/dashboard")}
-          >
-            Back to Dashboard
-          </Button>
         </Box>
 
-        <Grid container spacing={4}>
-          {/* Avatar Section */}
-          <Grid item xs={12} md={4}>
-            <Card>
-              <CardContent sx={{ textAlign: "center" }}>
-                <Box position="relative" display="inline-block">
-                  <Avatar
-                    src={user.image || undefined}
-                    sx={{ width: 120, height: 120, mb: 2 }}
-                  >
-                    {user.name?.charAt(0) || "U"}
-                  </Avatar>
-                  <IconButton
-                    sx={{
-                      position: "absolute",
-                      bottom: 8,
-                      right: 8,
-                      backgroundColor: "primary.main",
-                      color: "white",
-                      "&:hover": {
-                        backgroundColor: "primary.dark",
-                      },
-                    }}
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={loading}
-                  >
-                    <PhotoCameraIcon />
-                  </IconButton>
-                </Box>
-
+        {/* Profile Form */}
+        <Card sx={{ ...spacing.card, ...spacing.sectionSpacing }}>
+          <CardContent>
+            <Typography variant="h4" sx={spacing.title}>
+              Personal Information
+            </Typography>
+            
+            <Box sx={spacing.userInfo} mb={4}>
+              <Avatar src={user.image || undefined} sx={spacing.avatar}>
+                <PersonIcon sx={{ fontSize: 50 }} />
+              </Avatar>
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  Profile Picture
+                </Typography>
                 <input
-                  ref={fileInputRef}
-                  type="file"
                   accept="image/*"
                   style={{ display: "none" }}
+                  id="avatar-upload"
+                  type="file"
                   onChange={handleAvatarUpload}
                 />
-
-                <Typography variant="h6" gutterBottom>
-                  {user.name || "User"}
-                </Typography>
-                <Typography color="text.secondary" gutterBottom>
-                  {user.email}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Role: {user.role || "USER"}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* Profile Form */}
-          <Grid item xs={12} md={8}>
-            <Card>
-              <CardContent>
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mb={3}
-                >
-                  <Typography variant="h6">Personal Information</Typography>
-                  <Button
-                    variant={isEditing ? "outlined" : "contained"}
-                    startIcon={isEditing ? undefined : <EditIcon />}
-                    onClick={() => setIsEditing(!isEditing)}
-                    disabled={loading}
-                  >
-                    {isEditing ? "Cancel" : "Edit"}
+                <label htmlFor="avatar-upload">
+                  <Button variant="outlined" component="span">
+                    Upload New Picture
                   </Button>
-                </Box>
+                </label>
+              </Box>
+            </Box>
 
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="First Name"
-                      value={formData.firstName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, firstName: e.target.value })
-                      }
-                      disabled={!isEditing || loading}
-                      margin="normal"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Last Name"
-                      value={formData.lastName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, lastName: e.target.value })
-                      }
-                      disabled={!isEditing || loading}
-                      margin="normal"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Bio"
-                      value={formData.bio}
-                      onChange={(e) =>
-                        setFormData({ ...formData, bio: e.target.value })
-                      }
-                      disabled={!isEditing || loading}
-                      margin="normal"
-                      multiline
-                      rows={3}
-                      placeholder="Tell us about yourself..."
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Phone"
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      disabled={!isEditing || loading}
-                      margin="normal"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Location"
-                      value={formData.location}
-                      onChange={(e) =>
-                        setFormData({ ...formData, location: e.target.value })
-                      }
-                      disabled={!isEditing || loading}
-                      margin="normal"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Company"
-                      value={formData.company}
-                      onChange={(e) =>
-                        setFormData({ ...formData, company: e.target.value })
-                      }
-                      disabled={!isEditing || loading}
-                      margin="normal"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Job Title"
-                      value={formData.jobTitle}
-                      onChange={(e) =>
-                        setFormData({ ...formData, jobTitle: e.target.value })
-                      }
-                      disabled={!isEditing || loading}
-                      margin="normal"
-                    />
-                  </Grid>
-                </Grid>
+            <Divider sx={{ mb: 4 }} />
 
-                {isEditing && (
-                  <Box mt={3}>
-                    <Button
-                      variant="contained"
-                      startIcon={<SaveIcon />}
-                      onClick={handleSave}
-                      disabled={loading}
-                    >
-                      {loading ? "Saving..." : "Save Changes"}
-                    </Button>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Container>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+              <TextField
+                fullWidth
+                label="Name"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+              />
+
+              <TextField
+                fullWidth
+                label="Email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
+
+              <TextField
+                fullWidth
+                label="Bio"
+                multiline
+                rows={4}
+                value={formData.bio}
+                onChange={(e) =>
+                  setFormData({ ...formData, bio: e.target.value })
+                }
+              />
+
+              <Button
+                variant="contained"
+                onClick={handleSave}
+                disabled={loading}
+                {...spacing.button}
+                sx={{ alignSelf: "flex-start" }}
+              >
+                {loading ? "Saving..." : "Save Changes"}
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
     </AuthenticatedOnly>
   );
 }

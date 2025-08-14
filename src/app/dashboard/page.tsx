@@ -78,10 +78,7 @@ export default function DashboardPage() {
         <Card sx={{ ...spacing.card, ...spacing.sectionSpacing }}>
           <CardContent>
             <Box sx={spacing.userInfo}>
-              <Avatar
-                src={user.image || undefined}
-                sx={spacing.avatar}
-              >
+              <Avatar src={user.image || undefined} sx={spacing.avatar}>
                 <PersonIcon sx={{ fontSize: 50 }} />
               </Avatar>
               <Box flex={1}>
@@ -112,9 +109,7 @@ export default function DashboardPage() {
           <Box sx={spacing.cardItem}>
             <Card sx={spacing.card}>
               <CardContent sx={spacing.cardContent}>
-                <PersonIcon
-                  sx={{ ...spacing.icon, color: "primary.main" }}
-                />
+                <PersonIcon sx={{ ...spacing.icon, color: "primary.main" }} />
                 <Typography variant="h5" sx={spacing.title}>
                   Edit Profile
                 </Typography>
@@ -135,9 +130,7 @@ export default function DashboardPage() {
           <Box sx={spacing.cardItem}>
             <Card sx={spacing.card}>
               <CardContent sx={spacing.cardContent}>
-                <UploadIcon
-                  sx={{ ...spacing.icon, color: "primary.main" }}
-                />
+                <UploadIcon sx={{ ...spacing.icon, color: "primary.main" }} />
                 <Typography variant="h5" sx={spacing.title}>
                   Upload Files
                 </Typography>
@@ -158,9 +151,7 @@ export default function DashboardPage() {
           <Box sx={spacing.cardItem}>
             <Card sx={spacing.card}>
               <CardContent sx={spacing.cardContent}>
-                <SettingsIcon
-                  sx={{ ...spacing.icon, color: "primary.main" }}
-                />
+                <SettingsIcon sx={{ ...spacing.icon, color: "primary.main" }} />
                 <Typography variant="h5" sx={spacing.title}>
                   Settings
                 </Typography>
