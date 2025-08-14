@@ -8,7 +8,6 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
   Box,
   Tooltip,
 } from "@mui/material";
@@ -17,7 +16,6 @@ import {
   People as PeopleIcon,
   Assessment as AssessmentIcon,
   Security as SecurityIcon,
-  Home as HomeIcon,
 } from "@mui/icons-material";
 
 interface AdminSidebarProps {
@@ -33,20 +31,12 @@ const menuItems = [
   { text: "Security", icon: SecurityIcon, path: "/admin/security" },
 ];
 
-export default function AdminSidebar({
-  open,
-  drawerWidth,
-  collapsedWidth,
-}: AdminSidebarProps) {
+export default function AdminSidebar({ open, drawerWidth, collapsedWidth }: AdminSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
 
   const handleNavigation = (path: string) => {
     router.push(path);
-  };
-
-  const handleHome = () => {
-    router.push("/");
   };
 
   return (
@@ -69,38 +59,6 @@ export default function AdminSidebar({
       }}
     >
       <Box sx={{ overflow: "auto", mt: 1 }}>
-        <List>
-          <ListItem disablePadding>
-            <Tooltip
-              title="Back to Site"
-              placement="right"
-              disableHoverListener={open}
-            >
-              <ListItemButton
-                onClick={handleHome}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                  }}
-                >
-                  <HomeIcon />
-                </ListItemIcon>
-                {open && <ListItemText primary="Back to Site" />}
-              </ListItemButton>
-            </Tooltip>
-          </ListItem>
-        </List>
-
-        <Divider />
-
         <List>
           {menuItems.map((item) => {
             const Icon = item.icon;
