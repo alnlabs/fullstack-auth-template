@@ -101,7 +101,7 @@ export default function AdminUsersPage() {
 
   const handleToggleStatus = async (userId: string, currentStatus: string) => {
     const newStatus = currentStatus === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
-    
+
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: "PATCH",
@@ -110,9 +110,9 @@ export default function AdminUsersPage() {
       });
 
       if (response.ok) {
-        setUsers(users.map(u => 
-          u.id === userId ? { ...u, status: newStatus } : u
-        ));
+        setUsers(
+          users.map((u) => (u.id === userId ? { ...u, status: newStatus } : u))
+        );
       }
     } catch (error) {
       console.error("Failed to update user status:", error);
@@ -180,9 +180,10 @@ export default function AdminUsersPage() {
 
   const stats = {
     total: users.length,
-    active: users.filter(u => u.status === "ACTIVE").length,
-    admins: users.filter(u => u.role === "ADMIN" || u.role === "SUPERADMIN").length,
-    suspended: users.filter(u => u.status === "SUSPENDED").length,
+    active: users.filter((u) => u.status === "ACTIVE").length,
+    admins: users.filter((u) => u.role === "ADMIN" || u.role === "SUPERADMIN")
+      .length,
+    suspended: users.filter((u) => u.status === "SUSPENDED").length,
   };
 
   const rightControls = (
@@ -215,43 +216,50 @@ export default function AdminUsersPage() {
         rightControls={rightControls}
       >
         {/* Stats Cards */}
-        <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 2, mb: 3 }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+            gap: 1.5,
+            mb: 3,
+          }}
+        >
           <Card sx={{ ...spacing.card, height: "100%" }}>
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography variant="h4" color="primary" fontWeight={700}>
+            <CardContent sx={{ textAlign: "center", py: 2, px: 1 }}>
+              <Typography variant="h5" color="primary" fontWeight={700}>
                 {stats.total}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="caption" color="text.secondary">
                 Total Users
               </Typography>
             </CardContent>
           </Card>
           <Card sx={{ ...spacing.card, height: "100%" }}>
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography variant="h4" color="success.main" fontWeight={700}>
+            <CardContent sx={{ textAlign: "center", py: 2, px: 1 }}>
+              <Typography variant="h5" color="success.main" fontWeight={700}>
                 {stats.active}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="caption" color="text.secondary">
                 Active Users
               </Typography>
             </CardContent>
           </Card>
           <Card sx={{ ...spacing.card, height: "100%" }}>
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography variant="h4" color="warning.main" fontWeight={700}>
+            <CardContent sx={{ textAlign: "center", py: 2, px: 1 }}>
+              <Typography variant="h5" color="warning.main" fontWeight={700}>
                 {stats.admins}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="caption" color="text.secondary">
                 Administrators
               </Typography>
             </CardContent>
           </Card>
           <Card sx={{ ...spacing.card, height: "100%" }}>
-            <CardContent sx={{ textAlign: "center" }}>
-              <Typography variant="h4" color="error.main" fontWeight={700}>
+            <CardContent sx={{ textAlign: "center", py: 2, px: 1 }}>
+              <Typography variant="h5" color="error.main" fontWeight={700}>
                 {stats.suspended}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="caption" color="text.secondary">
                 Suspended
               </Typography>
             </CardContent>
@@ -261,7 +269,14 @@ export default function AdminUsersPage() {
         {/* Filters */}
         <Card sx={{ ...spacing.card, ...spacing.sectionSpacing }}>
           <CardContent>
-            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", alignItems: "center" }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
               <TextField
                 placeholder="Search users..."
                 value={searchTerm}
@@ -317,12 +332,20 @@ export default function AdminUsersPage() {
 
         {/* Users Grid/List */}
         {viewMode === "grid" ? (
-          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 2 }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+              gap: 2,
+            }}
+          >
             {filteredUsers.length === 0 ? (
               <Card sx={spacing.card}>
                 <CardContent sx={{ textAlign: "center", py: 4 }}>
                   <Typography color="text.secondary">
-                    {searchTerm || roleFilter !== "all" || statusFilter !== "all"
+                    {searchTerm ||
+                    roleFilter !== "all" ||
+                    statusFilter !== "all"
                       ? "No users match your filters"
                       : "No users found"}
                   </Typography>
@@ -335,14 +358,19 @@ export default function AdminUsersPage() {
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                       <Badge
                         overlap="circular"
-                        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                        anchorOrigin={{
+                          vertical: "bottom",
+                          horizontal: "right",
+                        }}
                         badgeContent={
                           <Box
                             sx={{
                               width: 12,
                               height: 12,
                               borderRadius: "50%",
-                              bgcolor: getStatusColor(user.status || "ACTIVE") + ".main",
+                              bgcolor:
+                                getStatusColor(user.status || "ACTIVE") +
+                                ".main",
                               border: "2px solid white",
                             }}
                           />
@@ -386,9 +414,18 @@ export default function AdminUsersPage() {
 
                     <Divider sx={{ my: 2 }} />
 
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
                       <Typography variant="caption" color="text.secondary">
-                        Joined: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
+                        Joined:{" "}
+                        {user.createdAt
+                          ? new Date(user.createdAt).toLocaleDateString()
+                          : "N/A"}
                       </Typography>
                       <Box sx={{ display: "flex", gap: 1 }}>
                         <Tooltip title="View Details">
@@ -404,8 +441,15 @@ export default function AdminUsersPage() {
                         <Tooltip title="Toggle Status">
                           <IconButton
                             size="small"
-                            color={user.status === "ACTIVE" ? "warning" : "success"}
-                            onClick={() => handleToggleStatus(user.id, user.status || "ACTIVE")}
+                            color={
+                              user.status === "ACTIVE" ? "warning" : "success"
+                            }
+                            onClick={() =>
+                              handleToggleStatus(
+                                user.id,
+                                user.status || "ACTIVE"
+                              )
+                            }
                           >
                             <SecurityIcon fontSize="small" />
                           </IconButton>
@@ -434,15 +478,22 @@ export default function AdminUsersPage() {
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 {filteredUsers.length === 0 ? (
-                  <Typography color="text.secondary" sx={{ textAlign: "center", py: 4 }}>
-                    {searchTerm || roleFilter !== "all" || statusFilter !== "all"
+                  <Typography
+                    color="text.secondary"
+                    sx={{ textAlign: "center", py: 4 }}
+                  >
+                    {searchTerm ||
+                    roleFilter !== "all" ||
+                    statusFilter !== "all"
                       ? "No users match your filters"
                       : "No users found"}
                   </Typography>
                 ) : (
                   filteredUsers.map((user) => (
                     <Card key={user.id} variant="outlined" sx={{ p: 2 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                      >
                         <Avatar src={user.image || undefined}>
                           {getRoleIcon(user.role || "USER")}
                         </Avatar>
@@ -454,7 +505,9 @@ export default function AdminUsersPage() {
                             {user.email || "No Email"}
                           </Typography>
                         </Box>
-                        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                        <Box
+                          sx={{ display: "flex", gap: 1, alignItems: "center" }}
+                        >
                           <Chip
                             label={user.role || "USER"}
                             color={getRoleColor(user.role || "USER")}
