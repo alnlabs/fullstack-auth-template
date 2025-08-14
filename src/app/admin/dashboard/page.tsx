@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/lib/auth-context";
+import { Box } from "@mui/material";
 import {
   People as PeopleIcon,
   Assessment as AssessmentIcon,
@@ -20,10 +21,9 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <div
-        className="dashboard-content"
-        style={{
-          width: "100%",
+      <Box
+        sx={{
+          width: 1, // This is 100% according to MUI System
           maxWidth: "none",
           backgroundColor: "yellow",
           border: "2px solid red",
@@ -36,17 +36,16 @@ export default function AdminDashboardPage() {
         />
 
         {/* Stats Grid */}
-        <div 
-          className="stats-grid"
-          style={{ 
+        <Box 
+          sx={{ 
             display: "flex", 
             flexWrap: "wrap", 
-            gap: "16px", 
-            marginBottom: "32px",
-            width: "100%"
+            gap: 2, 
+            mb: 4,
+            width: 1, // This is 100% according to MUI System
           }}
         >
-          <div style={{ flex: "1 1 200px", minWidth: "200px" }}>
+          <Box sx={{ flex: "1 1 200px", minWidth: "200px" }}>
             <StatCard
               title="Total Users"
               value="1,234"
@@ -54,8 +53,8 @@ export default function AdminDashboardPage() {
               color="primary"
               subtitle="+12% from last month"
             />
-          </div>
-          <div style={{ flex: "1 1 200px", minWidth: "200px" }}>
+          </Box>
+          <Box sx={{ flex: "1 1 200px", minWidth: "200px" }}>
             <StatCard
               title="Active Sessions"
               value="89"
@@ -63,8 +62,8 @@ export default function AdminDashboardPage() {
               color="success"
               subtitle="Currently online"
             />
-          </div>
-          <div style={{ flex: "1 1 200px", minWidth: "200px" }}>
+          </Box>
+          <Box sx={{ flex: "1 1 200px", minWidth: "200px" }}>
             <StatCard
               title="System Health"
               value="98%"
@@ -72,8 +71,8 @@ export default function AdminDashboardPage() {
               color="info"
               subtitle="All systems operational"
             />
-          </div>
-          <div style={{ flex: "1 1 200px", minWidth: "200px" }}>
+          </Box>
+          <Box sx={{ flex: "1 1 200px", minWidth: "200px" }}>
             <StatCard
               title="Storage Used"
               value="2.4GB"
@@ -81,37 +80,36 @@ export default function AdminDashboardPage() {
               color="warning"
               subtitle="of 10GB total"
             />
-          </div>
-        </div>
+          </Box>
+        </Box>
 
         {/* Quick Actions */}
-        <div 
-          className="quick-actions"
-          style={{ 
+        <Box 
+          sx={{ 
             display: "flex", 
             flexWrap: "wrap", 
-            gap: "16px",
-            width: "100%"
+            gap: 2,
+            width: 1, // This is 100% according to MUI System
           }}
         >
-          <div style={{ flex: "1 1 300px", minWidth: "300px" }}>
+          <Box sx={{ flex: "1 1 300px", minWidth: "300px" }}>
             <StatCard
               title="Recent Activity"
               value="No recent activity"
               color="secondary"
               subtitle="System is running smoothly"
             />
-          </div>
-          <div style={{ flex: "1 1 300px", minWidth: "300px" }}>
+          </Box>
+          <Box sx={{ flex: "1 1 300px", minWidth: "300px" }}>
             <StatCard
               title="System Status"
               value="All Good"
               color="success"
               subtitle="Everything is working properly"
             />
-          </div>
-        </div>
-      </div>
+          </Box>
+        </Box>
+      </Box>
     </AdminLayout>
   );
 }

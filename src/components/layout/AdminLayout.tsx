@@ -22,7 +22,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <AdminOnly>
-      <div className="admin-layout-container" style={{ display: "flex", minHeight: "100vh" }}>
+      <Box sx={{ display: "flex", minHeight: "100vh" }}>
         <AdminHeader onMenuClick={toggleSidebar} />
         <AdminSidebar
           open={sidebarOpen}
@@ -30,9 +30,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           collapsedWidth={collapsedDrawerWidth}
         />
 
-        <main
-          className="admin-main-content"
-          style={{
+        <Box
+          component="main"
+          sx={{
             flexGrow: 1,
             minHeight: "100vh",
             marginLeft: `${sidebarOpen ? drawerWidth : collapsedDrawerWidth}px`,
@@ -44,20 +44,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           }}
         >
           <Toolbar />
-          <div 
-            className="admin-content-wrapper"
-            style={{ 
-              padding: "8px", 
-              width: "100%", 
+          <Box 
+            sx={{ 
+              p: 1, 
+              width: 1, // This is 100% according to MUI System
               maxWidth: "none",
               backgroundColor: "pink",
               border: "3px solid purple",
             }}
           >
             {children}
-          </div>
-        </main>
-      </div>
+          </Box>
+        </Box>
+      </Box>
     </AdminOnly>
   );
 }
