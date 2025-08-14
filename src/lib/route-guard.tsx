@@ -57,11 +57,11 @@ const RouteGuard = memo(function RouteGuard({
 });
 
 // Convenience components for role-based access
-export const SuperAdminOnly = memo(function SuperAdminOnly({ 
-  children, 
-  showLoading = true 
-}: { 
-  children: ReactNode; 
+export const SuperAdminOnly = memo(function SuperAdminOnly({
+  children,
+  showLoading = true,
+}: {
+  children: ReactNode;
   showLoading?: boolean;
 }) {
   return (
@@ -71,29 +71,35 @@ export const SuperAdminOnly = memo(function SuperAdminOnly({
   );
 });
 
-export const AdminOnly = memo(function AdminOnly({ 
-  children, 
-  showLoading = true 
-}: { 
-  children: ReactNode; 
+export const AdminOnly = memo(function AdminOnly({
+  children,
+  showLoading = true,
+}: {
+  children: ReactNode;
   showLoading?: boolean;
 }) {
   return (
-    <RouteGuard allowedRoles={["ADMIN", "SUPERADMIN"]} showLoading={showLoading}>
+    <RouteGuard
+      allowedRoles={["ADMIN", "SUPERADMIN"]}
+      showLoading={showLoading}
+    >
       {children}
     </RouteGuard>
   );
 });
 
-export const AuthenticatedOnly = memo(function AuthenticatedOnly({ 
-  children, 
-  showLoading = true 
-}: { 
-  children: ReactNode; 
+export const AuthenticatedOnly = memo(function AuthenticatedOnly({
+  children,
+  showLoading = true,
+}: {
+  children: ReactNode;
   showLoading?: boolean;
 }) {
   return (
-    <RouteGuard allowedRoles={["USER", "ADMIN", "SUPERADMIN"]} showLoading={showLoading}>
+    <RouteGuard
+      allowedRoles={["USER", "ADMIN", "SUPERADMIN"]}
+      showLoading={showLoading}
+    >
       {children}
     </RouteGuard>
   );

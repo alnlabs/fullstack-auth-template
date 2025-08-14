@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -9,24 +8,74 @@ import {
   Button,
   Card,
   CardContent,
-  Paper,
+  Grid,
   Chip,
+  Avatar,
 } from "@mui/material";
 import {
   Login as LoginIcon,
   PersonAdd as RegisterIcon,
-  Google as GoogleIcon,
+  Dashboard as DashboardIcon,
+  AdminPanelSettings as AdminIcon,
 } from "@mui/icons-material";
+import { useAuth } from "@/lib/auth-context";
 
 export default function HomePage() {
-  const { data: session, status } = useSession();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
-  // Simple loading state
-  if (status === "loading") {
+  const features = [
+    {
+      title: "Authentication",
+      description: "Secure login with email/password and role-based access control",
+      icon: "🔐",
+    },
+    {
+      title: "User Management",
+      description: "Comprehensive user profiles and admin management",
+      icon: "👥",
+    },
+    {
+      title: "File Upload",
+      description: "Secure document and image upload with validation",
+      icon: "📁",
+    },
+    {
+      title: "Real-time Notifications",
+      description: "Toast notifications for better user experience",
+      icon: "🔔",
+    },
+    {
+      title: "Responsive Design",
+      description: "Modern UI that works on all devices",
+      icon: "📱",
+    },
+    {
+      title: "Performance Optimized",
+      description: "Fast loading with lazy loading and code splitting",
+      icon: "⚡",
+    },
+  ];
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case "SUPERADMIN":
+        return "error";
+      case "ADMIN":
+        return "warning";
+      default:
+        return "primary";
+    }
+  };
+
+  if (loading) {
     return (
-      <Container maxWidth="md" sx={{ mt: 8, textAlign: "center" }}>
-        <Typography>Loading...</Typography>
+      <Container maxWidth="lg" sx={{ mt: 8 }}>
+        <Box textAlign="center">
+          <Typography variant="h4" gutterBottom>
+            Loading...
+          </Typography>
+        </Box>
       </Container>
     );
   }
@@ -34,120 +83,153 @@ export default function HomePage() {
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       {/* Hero Section */}
-      <Box textAlign="center" mb={6}>
+      <Box textAlign="center" mb={8}>
         <Typography variant="h2" component="h1" gutterBottom fontWeight={700}>
-          Fullstack Auth Template
+          Welcome to MyMentor
         </Typography>
         <Typography variant="h5" color="text.secondary" mb={4}>
-          A simple, secure authentication system with Next.js, MUI, and Firebase
+          A comprehensive interview platform with advanced authentication and user management
         </Typography>
+
+        {user ? (
+          <Box>
+            <Box display="flex" alignItems="center" justifyContent="center" gap={2} mb={3}>
+              <Avatar src={user.image || undefined} sx={{ width: 64, height: 64 }}>
+                {user.name?.charAt(0)}
+              </Avatar>
+              <Box textAlign="left">
+                <Typography variant="h6">
+                  Welcome back, {user.name || "User"}!
+                </Typography>
+                <Chip
+                  label={user.role}
+                  color={getRoleColor(user.role)}
+                  size="small"
+                />
+              </Box>
+            </Box>
+            <Box display="flex" gap={2} justifyContent="center">
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={user.role === "ADMIN" || user.role === "SUPERADMIN" ? <AdminIcon /> : <DashboardIcon />}
+                onClick={() =>
+                  router.push(
+                    user.role === "ADMIN" || user.role === "SUPERADMIN"
+                      ? "/admin/dashboard"
+                      : "/dashboard"
+                  )
+                }
+              >
+                Go to Dashboard
+              </Button>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => router.push("/profile")}
+              >
+                View Profile
+              </Button>
+            </Box>
+          </Box>
+        ) : (
+          <Box display="flex" gap={2} justifyContent="center">
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<LoginIcon />}
+              onClick={() => router.push("/auth/login")}
+            >
+              Sign In
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              startIcon={<RegisterIcon />}
+              onClick={() => router.push("/auth/register")}
+            >
+              Create Account
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {/* Features Grid */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
-          gap: 4,
-          mb: 6,
-        }}
-      >
-        <Card>
-          <CardContent sx={{ textAlign: "center" }}>
-            <Typography variant="h6" gutterBottom>
-              🔐 Secure Authentication
-            </Typography>
-            <Typography color="text.secondary">
-              Local credentials and Google OAuth with Firebase
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent sx={{ textAlign: "center" }}>
-            <Typography variant="h6" gutterBottom>
-              👥 User Management
-            </Typography>
-            <Typography color="text.secondary">
-              Role-based access control and user profiles
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent sx={{ textAlign: "center" }}>
-            <Typography variant="h6" gutterBottom>
-              📁 File Upload
-            </Typography>
-            <Typography color="text.secondary">
-              Avatar and document upload with validation
-            </Typography>
-          </CardContent>
-        </Card>
+      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }, gap: 4, mb: 8 }}>
+        {features.map((feature, index) => (
+          <Card key={index} sx={{ height: "100%" }}>
+            <CardContent sx={{ textAlign: "center", p: 3 }}>
+              <Typography variant="h1" sx={{ fontSize: "3rem", mb: 2 }}>
+                {feature.icon}
+              </Typography>
+              <Typography variant="h6" gutterBottom>
+                {feature.title}
+              </Typography>
+              <Typography color="text.secondary">
+                {feature.description}
+              </Typography>
+            </CardContent>
+          </Card>
+        ))}
       </Box>
-
-      {/* Authentication Options */}
-      <Paper sx={{ p: 4, textAlign: "center" }}>
-        <Typography variant="h4" gutterBottom>
-          Get Started
-        </Typography>
-        <Typography color="text.secondary" mb={4}>
-          Choose your authentication method
-        </Typography>
-
-        <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap">
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<LoginIcon />}
-            onClick={() => router.push("/auth/login")}
-          >
-            Login
-          </Button>
-
-          <Button
-            variant="outlined"
-            size="large"
-            startIcon={<RegisterIcon />}
-            onClick={() => router.push("/auth/register")}
-          >
-            Register
-          </Button>
-
-          <Button
-            variant="outlined"
-            size="large"
-            startIcon={<GoogleIcon />}
-            onClick={() => router.push("/api/auth/signin")}
-          >
-            Sign in with Google
-          </Button>
-        </Box>
-
-        <Box mt={3}>
-          <Button variant="text" onClick={() => router.push("/demo")}>
-            View Demo
-          </Button>
-        </Box>
-      </Paper>
 
       {/* Tech Stack */}
-      <Box mt={6} textAlign="center">
-        <Typography variant="h6" gutterBottom>
-          Built with
-        </Typography>
-        <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap">
-          {[
-            "Next.js",
-            "React",
-            "TypeScript",
-            "MUI",
-            "Firebase",
-            "Prisma",
-            "PostgreSQL",
-          ].map((tech) => (
-            <Chip key={tech} label={tech} variant="outlined" />
-          ))}
+      <Card sx={{ mb: 6 }}>
+        <CardContent>
+          <Typography variant="h5" gutterBottom textAlign="center">
+            Built With Modern Technologies
+          </Typography>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" }, gap: 3 }}>
+            {[
+              { name: "Next.js 14", desc: "React framework with App Router" },
+              { name: "TypeScript", desc: "Type safety and better DX" },
+              { name: "Material-UI", desc: "Beautiful UI components" },
+              { name: "Prisma", desc: "Database ORM" },
+              { name: "PostgreSQL", desc: "Reliable database" },
+              { name: "JWT", desc: "Secure authentication" },
+            ].map((tech, index) => (
+              <Box key={index} textAlign="center" p={2}>
+                <Typography variant="h6" gutterBottom>
+                  {tech.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {tech.desc}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </CardContent>
+      </Card>
+
+      {/* Call to Action */}
+      {!user && (
+        <Box textAlign="center" mb={4}>
+          <Typography variant="h5" gutterBottom>
+            Ready to Get Started?
+          </Typography>
+          <Typography color="text.secondary" mb={3}>
+            Join thousands of users who trust MyMentor for their interview platform needs.
+          </Typography>
+          <Box display="flex" gap={2} justifyContent="center">
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<RegisterIcon />}
+              onClick={() => router.push("/auth/register")}
+            >
+              Create Free Account
+            </Button>
+            <Button
+              variant="outlined"
+              size="large"
+              startIcon={<LoginIcon />}
+              onClick={() => router.push("/auth/login")}
+            >
+              Sign In
+            </Button>
+          </Box>
         </Box>
-      </Box>
+      )}
     </Container>
   );
 }

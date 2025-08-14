@@ -1,8 +1,7 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Container,
@@ -19,380 +18,357 @@ import {
   Paper,
   Chip,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   TextField,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Alert,
-  Pagination,
-} from '@mui/material'
+  CircularProgress,
+  Grid,
+} from "@mui/material";
 import {
+  Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Search as SearchIcon,
-  Add as AddIcon,
   ArrowBack as ArrowBackIcon,
-} from '@mui/icons-material'
+  Refresh as RefreshIcon,
+} from "@mui/icons-material";
+import { AdminOnly } from "@/lib/route-guard";
+import { useAuth } from "@/lib/auth-context";
+import { ToastUtils, ToastMessages } from "@/lib/toast";
 
 interface User {
-  id: string
-  email: string
-  username: string
-  firstName: string
-  lastName: string
-  role: string
-  status: string
-  createdAt: string
-  lastActive: string
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: "USER" | "ADMIN" | "SUPERADMIN";
+  status: "ACTIVE" | "INACTIVE" | "SUSPENDED" | "PENDING_VERIFICATION";
+  createdAt: string;
+  lastLoginAt?: string;
 }
 
 export default function AdminUsersPage() {
-  const { data: session } = useSession()
-  const router = useRouter()
-  const [users, setUsers] = useState<User[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedRole, setSelectedRole] = useState('')
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const [editForm, setEditForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    role: '',
-    status: '',
-  })
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    role: "USER" as const,
+    status: "ACTIVE" as const,
+  });
+
+  if (!user) {
+    return null; // RouteGuard will handle the redirect
+  }
 
   useEffect(() => {
-    if (session && (session.user?.role === 'ADMIN' || session.user?.role === 'SUPERADMIN')) {
-      fetchUsers()
-    }
-  }, [session, page, searchTerm, selectedRole])
-
-  if (!session) {
-    router.push('/auth/login')
-    return null
-  }
-
-  if (session.user?.role !== 'ADMIN' && session.user?.role !== 'SUPERADMIN') {
-    router.push('/dashboard')
-    return null
-  }
+    fetchUsers();
+  }, []);
 
   const fetchUsers = async () => {
     try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '10',
-        ...(searchTerm && { query: searchTerm }),
-        ...(selectedRole && { role: selectedRole }),
-      })
+      const response = await fetch("/api/admin/users", {
+        credentials: "include",
+      });
 
-      const response = await fetch(`/api/admin/users?${params}`)
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.error || 'Failed to fetch users')
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data.users);
       } else {
-        setUsers(data.users)
-        setTotalPages(Math.ceil(data.total / 10))
+        ToastUtils.error("Failed to fetch users");
       }
     } catch (error) {
-      setError('An error occurred while fetching users')
+      ToastUtils.error("Failed to fetch users");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleEditUser = (user: User) => {
-    setSelectedUser(user)
-    setEditForm({
+    setEditingUser(user);
+    setFormData({
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       role: user.role,
       status: user.status,
-    })
-    setEditDialogOpen(true)
-  }
+    });
+    setDialogOpen(true);
+  };
 
   const handleSaveUser = async () => {
-    if (!selectedUser) return
+    if (!editingUser) return;
 
     try {
-      const response = await fetch(`/api/admin/users`, {
-        method: 'PUT',
+      const response = await fetch(`/api/admin/users/${editingUser.id}`, {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userId: selectedUser.id,
-          ...editForm,
-        }),
-      })
+        body: JSON.stringify(formData),
+      });
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.error || 'Failed to update user')
+      if (response.ok) {
+        ToastUtils.success(ToastMessages.admin.userUpdated);
+        setDialogOpen(false);
+        setEditingUser(null);
+        fetchUsers();
       } else {
-        setEditDialogOpen(false)
-        setSelectedUser(null)
-        fetchUsers()
+        const data = await response.json();
+        ToastUtils.error(data.error || ToastMessages.admin.userActionError);
       }
     } catch (error) {
-      setError('An error occurred while updating user')
+      ToastUtils.error(ToastMessages.admin.userActionError);
     }
-  }
+  };
 
-  const handleDeleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    if (!confirm(`Are you sure you want to delete ${userName}?`)) return;
 
     try {
-      const response = await fetch(`/api/admin/users`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId }),
-      })
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: "DELETE",
+      });
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.error || 'Failed to delete user')
+      if (response.ok) {
+        ToastUtils.success(ToastMessages.admin.userDeleted);
+        fetchUsers();
       } else {
-        fetchUsers()
+        const data = await response.json();
+        ToastUtils.error(data.error || ToastMessages.admin.userActionError);
       }
     } catch (error) {
-      setError('An error occurred while deleting user')
+      ToastUtils.error(ToastMessages.admin.userActionError);
     }
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'ACTIVE':
-        return 'success'
-      case 'INACTIVE':
-        return 'warning'
-      case 'SUSPENDED':
-        return 'error'
-      default:
-        return 'default'
-    }
-  }
+  };
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'SUPERADMIN':
-        return 'error'
-      case 'ADMIN':
-        return 'warning'
+      case "SUPERADMIN":
+        return "error";
+      case "ADMIN":
+        return "warning";
       default:
-        return 'primary'
+        return "primary";
     }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "ACTIVE":
+        return "success";
+      case "INACTIVE":
+        return "default";
+      case "SUSPENDED":
+        return "error";
+      case "PENDING_VERIFICATION":
+        return "warning";
+      default:
+        return "default";
+    }
+  };
+
+  if (loading) {
+    return (
+      <AdminOnly>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+          <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+            <CircularProgress />
+          </Box>
+        </Container>
+      </AdminOnly>
+    );
   }
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4 }}>
-      {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-        <Typography variant="h4" component="h1">
-          User Management
-        </Typography>
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => router.push('/dashboard')}
+    <AdminOnly>
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        {/* Header */}
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={4}
         >
-          Back to Dashboard
-        </Button>
-      </Box>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      {/* Filters */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display="flex" gap={2} alignItems="center">
-            <TextField
-              label="Search users"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              startIcon={<SearchIcon />}
-              sx={{ flexGrow: 1 }}
-            />
-            <FormControl sx={{ minWidth: 120 }}>
-              <InputLabel>Role</InputLabel>
-              <Select
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
-                label="Role"
-              >
-                <MenuItem value="">All Roles</MenuItem>
-                <MenuItem value="USER">User</MenuItem>
-                <MenuItem value="ADMIN">Admin</MenuItem>
-                <MenuItem value="SUPERADMIN">Super Admin</MenuItem>
-              </Select>
-            </FormControl>
+          <Typography variant="h4" component="h1">
+            User Management
+          </Typography>
+          <Box display="flex" gap={2}>
+            <Button
+              startIcon={<RefreshIcon />}
+              onClick={fetchUsers}
+            >
+              Refresh
+            </Button>
+            <Button
+              startIcon={<ArrowBackIcon />}
+              onClick={() => router.push("/admin/dashboard")}
+            >
+              Back to Dashboard
+            </Button>
           </Box>
-        </CardContent>
-      </Card>
+        </Box>
 
-      {/* Users Table */}
-      <Card>
-        <CardContent>
-          <TableContainer component={Paper} variant="outlined">
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Username</TableCell>
-                  <TableCell>Role</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Created</TableCell>
-                  <TableCell>Last Active</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      {user.firstName} {user.lastName}
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.username}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={user.role}
-                        color={getRoleColor(user.role) as any}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={user.status}
-                        color={getStatusColor(user.status) as any}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      {user.lastActive
-                        ? new Date(user.lastActive).toLocaleDateString()
-                        : 'Never'}
-                    </TableCell>
-                    <TableCell>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEditUser(user)}
-                        disabled={user.role === 'SUPERADMIN' && session.user?.role !== 'SUPERADMIN'}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => handleDeleteUser(user.id)}
-                        disabled={
-                          user.role === 'SUPERADMIN' ||
-                          (session.user?.role !== 'SUPERADMIN' && user.role === 'ADMIN')
-                        }
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
+        {/* Users Table */}
+        <Card>
+          <CardContent>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Email</TableCell>
+                    <TableCell>Role</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Created</TableCell>
+                    <TableCell>Last Login</TableCell>
+                    <TableCell>Actions</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {users.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell>
+                        {user.firstName} {user.lastName}
+                      </TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={user.role}
+                          color={getRoleColor(user.role)}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={user.status}
+                          color={getStatusColor(user.status)}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {new Date(user.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {user.lastLoginAt
+                          ? new Date(user.lastLoginAt).toLocaleDateString()
+                          : "Never"}
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleEditUser(user)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => handleDeleteUser(user.id, `${user.firstName} ${user.lastName}`)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </CardContent>
+        </Card>
 
-          {/* Pagination */}
-          <Box display="flex" justifyContent="center" mt={3}>
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={(_, value) => setPage(value)}
-              color="primary"
-            />
-          </Box>
-        </CardContent>
-      </Card>
-
-      {/* Edit User Dialog */}
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit User</DialogTitle>
-        <DialogContent>
-          <Box display="flex" flexDirection="column" gap={2} mt={1}>
-            <TextField
-              label="First Name"
-              value={editForm.firstName}
-              onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
-              fullWidth
-            />
-            <TextField
-              label="Last Name"
-              value={editForm.lastName}
-              onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
-              fullWidth
-            />
-            <TextField
-              label="Email"
-              value={editForm.email}
-              onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-              fullWidth
-            />
-            <FormControl fullWidth>
-              <InputLabel>Role</InputLabel>
-              <Select
-                value={editForm.role}
-                onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                label="Role"
-              >
-                <MenuItem value="USER">User</MenuItem>
-                <MenuItem value="ADMIN">Admin</MenuItem>
-                {session.user?.role === 'SUPERADMIN' && (
-                  <MenuItem value="SUPERADMIN">Super Admin</MenuItem>
-                )}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={editForm.status}
-                onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                label="Status"
-              >
-                <MenuItem value="ACTIVE">Active</MenuItem>
-                <MenuItem value="INACTIVE">Inactive</MenuItem>
-                <MenuItem value="SUSPENDED">Suspended</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSaveUser} variant="contained">
-            Save Changes
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
-  )
+        {/* Edit User Dialog */}
+        <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+          <DialogTitle>Edit User</DialogTitle>
+          <DialogContent>
+            <Box sx={{ pt: 2 }}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="First Name"
+                    value={formData.firstName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, firstName: e.target.value })
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Last Name"
+                    value={formData.lastName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lastName: e.target.value })
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Role</InputLabel>
+                    <Select
+                      value={formData.role}
+                      onChange={(e) =>
+                        setFormData({ ...formData, role: e.target.value as any })
+                      }
+                      label="Role"
+                    >
+                      <MenuItem value="USER">User</MenuItem>
+                      <MenuItem value="ADMIN">Admin</MenuItem>
+                      <MenuItem value="SUPERADMIN">Super Admin</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                      value={formData.status}
+                      onChange={(e) =>
+                        setFormData({ ...formData, status: e.target.value as any })
+                      }
+                      label="Status"
+                    >
+                      <MenuItem value="ACTIVE">Active</MenuItem>
+                      <MenuItem value="INACTIVE">Inactive</MenuItem>
+                      <MenuItem value="SUSPENDED">Suspended</MenuItem>
+                      <MenuItem value="PENDING_VERIFICATION">Pending Verification</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveUser} variant="contained">
+              Save Changes
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Container>
+    </AdminOnly>
+  );
 }

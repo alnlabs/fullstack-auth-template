@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
   Box,
@@ -11,88 +10,79 @@ import {
   Card,
   CardContent,
   Grid,
-  Alert,
-  Chip,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
   IconButton,
+  Chip,
   LinearProgress,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
 } from "@mui/material";
 import {
-  CloudUpload as CloudUploadIcon,
+  CloudUpload as UploadIcon,
+  Description as FileIcon,
   Delete as DeleteIcon,
-  Description as DescriptionIcon,
-  Image as ImageIcon,
+  CheckCircle as SuccessIcon,
+  Error as ErrorIcon,
   ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
+import { useAuth } from "@/lib/auth-context";
+import { AuthenticatedOnly } from "@/lib/route-guard";
+import { ToastUtils, ToastMessages } from "@/lib/toast";
 
-interface FileWithPreview extends File {
-  preview?: string;
+interface UploadedFile {
   id: string;
+  name: string;
+  size: number;
+  type: string;
+  uploadedAt: string;
+  status: "uploading" | "success" | "error";
 }
 
 export default function UploadPage() {
-  const { data: session } = useSession();
+  const { user } = useAuth();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [files, setFiles] = useState<FileWithPreview[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-  const [category, setCategory] = useState("OTHER");
-  const [description, setDescription] = useState("");
 
-  if (!session) {
-    router.push("/auth/login");
-    return null;
+  if (!user) {
+    return null; // RouteGuard will handle the redirect
   }
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(event.target.files || []);
-
-    const newFiles: FileWithPreview[] = selectedFiles.map((file) => ({
-      ...file,
-      id: Math.random().toString(36).substr(2, 9),
-      preview: file.type.startsWith("image/")
-        ? URL.createObjectURL(file)
-        : undefined,
-    }));
-
-    setFiles((prev) => [...prev, ...newFiles]);
-  };
-
-  const handleRemoveFile = (fileId: string) => {
-    setFiles((prev) => {
-      const fileToRemove = prev.find((f) => f.id === fileId);
-      if (fileToRemove?.preview) {
-        URL.revokeObjectURL(fileToRemove.preview);
-      }
-      return prev.filter((f) => f.id !== fileId);
-    });
-  };
-
-  const handleUpload = async () => {
-    if (files.length === 0) {
-      setError("Please select at least one file");
-      return;
-    }
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
     setUploading(true);
-    setError("");
-    setMessage("");
     setUploadProgress(0);
 
-    try {
-      const uploadPromises = files.map(async (file, index) => {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        ToastUtils.error(`File ${file.name} is too large. Maximum size is 5MB.`);
+        continue;
+      }
+
+      // Create a temporary file entry
+      const tempFile: UploadedFile = {
+        id: `temp-${Date.now()}-${i}`,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date().toISOString(),
+        status: "uploading",
+      };
+
+      setUploadedFiles(prev => [...prev, tempFile]);
+
+      try {
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("category", category);
-        formData.append("description", description);
 
         const response = await fetch("/api/users/upload-document", {
           method: "POST",
@@ -101,34 +91,67 @@ export default function UploadPage() {
 
         const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.error || `Failed to upload ${file.name}`);
+        if (response.ok) {
+          // Update file status to success
+          setUploadedFiles(prev =>
+            prev.map(f =>
+              f.id === tempFile.id
+                ? { ...f, id: data.fileId, status: "success" as const }
+                : f
+            )
+          );
+          ToastUtils.success(`File ${file.name} uploaded successfully!`);
+        } else {
+          // Update file status to error
+          setUploadedFiles(prev =>
+            prev.map(f =>
+              f.id === tempFile.id
+                ? { ...f, status: "error" as const }
+                : f
+            )
+          );
+          ToastUtils.error(data.error || `Failed to upload ${file.name}`);
         }
 
         // Update progress
-        setUploadProgress(((index + 1) / files.length) * 100);
+        setUploadProgress(((i + 1) / files.length) * 100);
+      } catch (error) {
+        // Update file status to error
+        setUploadedFiles(prev =>
+          prev.map(f =>
+            f.id === tempFile.id
+              ? { ...f, status: "error" as const }
+              : f
+          )
+        );
+        ToastUtils.error(`Failed to upload ${file.name}`);
+      }
+    }
 
-        return { success: true, file: file.name, data };
-      });
-
-      await Promise.all(uploadPromises);
-      setMessage(`Successfully uploaded ${files.length} file(s)`);
-      setFiles([]);
-      setCategory("OTHER");
-      setDescription("");
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Upload failed");
-    } finally {
-      setUploading(false);
-      setUploadProgress(0);
+    setUploading(false);
+    setUploadProgress(0);
+    
+    // Clear the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
-  const getFileIcon = (file: File) => {
-    if (file.type.startsWith("image/")) {
-      return <ImageIcon />;
+  const handleDeleteFile = async (fileId: string, fileName: string) => {
+    try {
+      const response = await fetch(`/api/users/documents/${fileId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
+        ToastUtils.success(`File ${fileName} deleted successfully!`);
+      } else {
+        ToastUtils.error(`Failed to delete ${fileName}`);
+      }
+    } catch (error) {
+      ToastUtils.error(`Failed to delete ${fileName}`);
     }
-    return <DescriptionIcon />;
   };
 
   const formatFileSize = (bytes: number) => {
@@ -139,270 +162,165 @@ export default function UploadPage() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
-  const validateFile = (file: File) => {
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "text/plain",
-      "text/csv",
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/webp",
-      "image/gif",
-    ];
-
-    if (file.size > maxSize) {
-      return `File size must be less than 5MB (${file.name})`;
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "uploading":
+        return <LinearProgress sx={{ width: 20, height: 20 }} />;
+      case "success":
+        return <SuccessIcon color="success" />;
+      case "error":
+        return <ErrorIcon color="error" />;
+      default:
+        return <FileIcon />;
     }
+  };
 
-    if (!allowedTypes.includes(file.type)) {
-      return `File type not supported (${file.name})`;
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "uploading":
+        return "warning";
+      case "success":
+        return "success";
+      case "error":
+        return "error";
+      default:
+        return "default";
     }
-
-    return null;
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      {/* Header */}
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={4}
-      >
-        <Typography variant="h4" component="h1">
-          File Upload
-        </Typography>
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => router.push("/dashboard")}
+    <AuthenticatedOnly>
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        {/* Header */}
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={4}
         >
-          Back to Dashboard
-        </Button>
-      </Box>
+          <Typography variant="h4" component="h1">
+            File Upload
+          </Typography>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => router.push("/dashboard")}
+          >
+            Back to Dashboard
+          </Button>
+        </Box>
 
-      {message && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          {message}
-        </Alert>
-      )}
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      <Grid container spacing={4}>
-        {/* Upload Area */}
-        <Grid item xs={12} md={8}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Upload Files
-              </Typography>
-
-              {/* File Input */}
-              <Box
-                sx={{
-                  border: "2px dashed",
-                  borderColor: "primary.main",
-                  borderRadius: 2,
-                  p: 4,
-                  textAlign: "center",
-                  cursor: "pointer",
-                  backgroundColor: "primary.50",
-                  "&:hover": {
-                    backgroundColor: "primary.100",
-                  },
-                }}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <CloudUploadIcon
-                  sx={{ fontSize: 48, color: "primary.main", mb: 2 }}
-                />
+        <Grid container spacing={4}>
+          {/* Upload Section */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
                 <Typography variant="h6" gutterBottom>
-                  Click to select files or drag and drop
+                  Upload Files
                 </Typography>
-                <Typography color="text.secondary" mb={2}>
-                  Supported formats: PDF, DOC, DOCX, XLS, XLSX, TXT, CSV, Images
+                <Typography color="text.secondary" paragraph>
+                  Upload documents, images, or other files. Maximum file size is 5MB.
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Maximum file size: 5MB per file
-                </Typography>
-              </Box>
 
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv,.jpg,.jpeg,.png,.webp,.gif"
-                style={{ display: "none" }}
-                onChange={handleFileSelect}
-              />
-
-              {/* Upload Progress */}
-              {uploading && (
-                <Box mt={3}>
-                  <Typography variant="body2" gutterBottom>
-                    Uploading files... {Math.round(uploadProgress)}%
-                  </Typography>
-                  <LinearProgress
-                    variant="determinate"
-                    value={uploadProgress}
-                  />
-                </Box>
-              )}
-
-              {/* Upload Button */}
-              {files.length > 0 && (
-                <Box mt={3}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    onClick={handleUpload}
-                    disabled={uploading}
-                    fullWidth
-                  >
-                    {uploading
-                      ? "Uploading..."
-                      : `Upload ${files.length} File(s)`}
-                  </Button>
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Settings */}
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Upload Settings
-              </Typography>
-
-              <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Category</InputLabel>
-                <Select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  label="Category"
+                <Box
+                  sx={{
+                    border: "2px dashed",
+                    borderColor: "primary.main",
+                    borderRadius: 2,
+                    p: 4,
+                    textAlign: "center",
+                    cursor: "pointer",
+                    "&:hover": {
+                      borderColor: "primary.dark",
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                  onClick={() => fileInputRef.current?.click()}
                 >
-                  <MenuItem value="RESUME">Resume</MenuItem>
-                  <MenuItem value="PORTFOLIO">Portfolio</MenuItem>
-                  <MenuItem value="CERTIFICATE">Certificate</MenuItem>
-                  <MenuItem value="OTHER">Other</MenuItem>
-                </Select>
-              </FormControl>
+                  <UploadIcon sx={{ fontSize: 48, color: "primary.main", mb: 2 }} />
+                  <Typography variant="h6" gutterBottom>
+                    Click to Upload
+                  </Typography>
+                  <Typography color="text.secondary">
+                    or drag and drop files here
+                  </Typography>
+                </Box>
 
-              <TextField
-                fullWidth
-                label="Description (optional)"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                multiline
-                rows={3}
-                placeholder="Brief description of the files..."
-              />
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  style={{ display: "none" }}
+                  onChange={handleFileSelect}
+                  disabled={uploading}
+                />
 
-      {/* Selected Files */}
-      {files.length > 0 && (
-        <Card sx={{ mt: 4 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Selected Files ({files.length})
-            </Typography>
+                {uploading && (
+                  <Box mt={2}>
+                    <LinearProgress variant="determinate" value={uploadProgress} />
+                    <Typography variant="body2" color="text.secondary" mt={1}>
+                      Uploading... {Math.round(uploadProgress)}%
+                    </Typography>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
 
-            <Grid container spacing={2}>
-              {files.map((file) => {
-                const validationError = validateFile(file);
-
-                return (
-                  <Grid item xs={12} sm={6} md={4} key={file.id}>
-                    <Card variant="outlined">
-                      <CardContent>
-                        <Box display="flex" alignItems="center" gap={2}>
-                          <Box
-                            sx={{
-                              p: 1,
-                              borderRadius: 1,
-                              backgroundColor: validationError
-                                ? "error.50"
-                                : "primary.50",
-                              color: validationError
-                                ? "error.main"
-                                : "primary.main",
-                            }}
-                          >
-                            {getFileIcon(file)}
-                          </Box>
-
-                          <Box flex={1}>
-                            <Typography variant="body2" fontWeight={500} noWrap>
-                              {file.name}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                            >
-                              {formatFileSize(file.size)}
-                            </Typography>
-                            {validationError && (
-                              <Typography
-                                variant="caption"
-                                color="error"
-                                display="block"
-                              >
-                                {validationError}
-                              </Typography>
-                            )}
-                          </Box>
-
+          {/* File List */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Uploaded Files
+                </Typography>
+                
+                {uploadedFiles.length === 0 ? (
+                  <Typography color="text.secondary" textAlign="center" py={4}>
+                    No files uploaded yet
+                  </Typography>
+                ) : (
+                  <List>
+                    {uploadedFiles.map((file) => (
+                      <ListItem
+                        key={file.id}
+                        secondaryAction={
                           <IconButton
-                            size="small"
-                            color="error"
-                            onClick={() => handleRemoveFile(file.id)}
-                            disabled={uploading}
+                            edge="end"
+                            onClick={() => handleDeleteFile(file.id, file.name)}
+                            disabled={file.status === "uploading"}
                           >
                             <DeleteIcon />
                           </IconButton>
-                        </Box>
-
-                        {/* Image Preview */}
-                        {file.preview && (
-                          <Box mt={2}>
-                            <img
-                              src={file.preview}
-                              alt={file.name}
-                              style={{
-                                width: "100%",
-                                height: 100,
-                                objectFit: "cover",
-                                borderRadius: 4,
-                              }}
-                            />
-                          </Box>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </CardContent>
-        </Card>
-      )}
-    </Container>
+                        }
+                      >
+                        <ListItemIcon>
+                          {getStatusIcon(file.status)}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={file.name}
+                          secondary={
+                            <Box>
+                              <Typography variant="body2" color="text.secondary">
+                                {formatFileSize(file.size)} • {new Date(file.uploadedAt).toLocaleDateString()}
+                              </Typography>
+                              <Chip
+                                label={file.status}
+                                color={getStatusColor(file.status)}
+                                size="small"
+                                sx={{ mt: 0.5 }}
+                              />
+                            </Box>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Container>
+    </AuthenticatedOnly>
   );
 }

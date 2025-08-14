@@ -1,8 +1,7 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Container,
@@ -11,478 +10,472 @@ import {
   Card,
   CardContent,
   Grid,
-  Alert,
   TextField,
   Divider,
   Switch,
   FormControlLabel,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material'
+  Alert,
+  IconButton,
+  InputAdornment,
+} from "@mui/material";
 import {
-  Security as SecurityIcon,
-  Notifications as NotificationsIcon,
-  PrivacyTip as PrivacyIcon,
-  Delete as DeleteIcon,
-  ArrowBack as ArrowBackIcon,
+  Save as SaveIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
-} from '@mui/icons-material'
+  ArrowBack as ArrowBackIcon,
+  Security as SecurityIcon,
+  Notifications as NotificationsIcon,
+  Palette as PaletteIcon,
+} from "@mui/icons-material";
+import { useAuth } from "@/lib/auth-context";
+import { AuthenticatedOnly } from "@/lib/route-guard";
+import { ToastUtils, ToastMessages } from "@/lib/toast";
 
 export default function SettingsPage() {
-  const { data: session } = useSession()
-  const router = useRouter()
+  const { user } = useAuth();
+  const router = useRouter();
 
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [error, setError] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Password change form
-  const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-  })
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
-  // Notification settings
-  const [notifications, setNotifications] = useState({
+  const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
     pushNotifications: false,
     marketingEmails: false,
     securityAlerts: true,
-  })
+  });
 
-  // Privacy settings
-  const [privacy, setPrivacy] = useState({
-    profileVisibility: 'public',
-    showEmail: false,
-    showPhone: false,
-    allowSearch: true,
-  })
+  const [appSettings, setAppSettings] = useState({
+    darkMode: false,
+    autoSave: true,
+    twoFactorAuth: false,
+  });
 
-  if (!session) {
-    router.push('/auth/login')
-    return null
+  if (!user) {
+    return null; // RouteGuard will handle the redirect
   }
 
   const handlePasswordChange = async () => {
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setError('New passwords do not match')
-      return
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      ToastUtils.error("New passwords do not match");
+      return;
     }
 
-    if (passwordForm.newPassword.length < 8) {
-      setError('Password must be at least 8 characters long')
-      return
+    if (passwordData.newPassword.length < 8) {
+      ToastUtils.error("New password must be at least 8 characters long");
+      return;
     }
 
-    setLoading(true)
-    setError('')
+    setLoading(true);
 
     try {
-      const response = await fetch('/api/users/change-password', {
-        method: 'POST',
+      const response = await fetch("/api/users/change-password", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          currentPassword: passwordForm.currentPassword,
-          newPassword: passwordForm.newPassword,
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
-      if (!response.ok) {
-        setError(data.error || 'Failed to change password')
+      if (response.ok) {
+        ToastUtils.success(ToastMessages.auth.passwordChanged);
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
       } else {
-        setMessage('Password changed successfully!')
-        setPasswordForm({
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: '',
-        })
+        ToastUtils.error(data.error || ToastMessages.auth.passwordChangeError);
       }
     } catch (error) {
-      setError('An error occurred. Please try again.')
+      ToastUtils.error(ToastMessages.auth.passwordChangeError);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleDeleteAccount = async () => {
-    setLoading(true)
-    setError('')
+  const handleNotificationSettingsChange = async () => {
+    setLoading(true);
 
     try {
-      const response = await fetch('/api/users/delete-account', {
-        method: 'DELETE',
+      const response = await fetch("/api/users/settings/notifications", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-      })
+        body: JSON.stringify(notificationSettings),
+      });
 
-      if (!response.ok) {
-        const data = await response.json()
-        setError(data.error || 'Failed to delete account')
+      if (response.ok) {
+        ToastUtils.success(ToastMessages.general.saveSuccess);
       } else {
-        router.push('/')
+        ToastUtils.error(ToastMessages.general.saveError);
       }
     } catch (error) {
-      setError('An error occurred. Please try again.')
+      ToastUtils.error(ToastMessages.general.saveError);
     } finally {
-      setLoading(false)
-      setDeleteDialogOpen(false)
+      setLoading(false);
     }
-  }
+  };
+
+  const handleAppSettingsChange = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/users/settings/app", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(appSettings),
+      });
+
+      if (response.ok) {
+        ToastUtils.success(ToastMessages.general.saveSuccess);
+      } else {
+        ToastUtils.error(ToastMessages.general.saveError);
+      }
+    } catch (error) {
+      ToastUtils.error(ToastMessages.general.saveError);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-        <Typography variant="h4" component="h1">
-          Settings
-        </Typography>
-        <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => router.push('/dashboard')}
+    <AuthenticatedOnly>
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+        {/* Header */}
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={4}
         >
-          Back to Dashboard
-        </Button>
-      </Box>
-
-      {message && (
-        <Alert severity="success" sx={{ mb: 3 }}>
-          {message}
-        </Alert>
-      )}
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      <Grid container spacing={4}>
-        {/* Security Settings */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" mb={3}>
-                <SecurityIcon sx={{ mr: 1, color: 'primary.main' }} />
-                <Typography variant="h6">
-                  Security Settings
-                </Typography>
-              </Box>
-
-              <Typography variant="body2" color="text.secondary" mb={3}>
-                Manage your account security and password settings.
-              </Typography>
-
-              <TextField
-                fullWidth
-                label="Current Password"
-                type={showPassword ? 'text' : 'password'}
-                value={passwordForm.currentPassword}
-                onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                margin="normal"
-              />
-
-              <TextField
-                fullWidth
-                label="New Password"
-                type={showPassword ? 'text' : 'password'}
-                value={passwordForm.newPassword}
-                onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                margin="normal"
-                helperText="Password must be at least 8 characters long"
-              />
-
-              <TextField
-                fullWidth
-                label="Confirm New Password"
-                type={showPassword ? 'text' : 'password'}
-                value={passwordForm.confirmPassword}
-                onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                margin="normal"
-              />
-
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={showPassword}
-                    onChange={(e) => setShowPassword(e.target.checked)}
-                  />
-                }
-                label="Show password"
-                sx={{ mt: 1 }}
-              />
-
-              <Button
-                variant="contained"
-                onClick={handlePasswordChange}
-                disabled={loading || !passwordForm.currentPassword || !passwordForm.newPassword}
-                sx={{ mt: 2 }}
-              >
-                {loading ? 'Changing Password...' : 'Change Password'}
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Notification Settings */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" mb={3}>
-                <NotificationsIcon sx={{ mr: 1, color: 'primary.main' }} />
-                <Typography variant="h6">
-                  Notification Settings
-                </Typography>
-              </Box>
-
-              <Typography variant="body2" color="text.secondary" mb={3}>
-                Control how you receive notifications and updates.
-              </Typography>
-
-              <List>
-                <ListItem>
-                  <ListItemText
-                    primary="Email Notifications"
-                    secondary="Receive important updates via email"
-                  />
-                  <Switch
-                    checked={notifications.emailNotifications}
-                    onChange={(e) => setNotifications({
-                      ...notifications,
-                      emailNotifications: e.target.checked
-                    })}
-                  />
-                </ListItem>
-
-                <ListItem>
-                  <ListItemText
-                    primary="Push Notifications"
-                    secondary="Receive real-time notifications"
-                  />
-                  <Switch
-                    checked={notifications.pushNotifications}
-                    onChange={(e) => setNotifications({
-                      ...notifications,
-                      pushNotifications: e.target.checked
-                    })}
-                  />
-                </ListItem>
-
-                <ListItem>
-                  <ListItemText
-                    primary="Marketing Emails"
-                    secondary="Receive promotional content and offers"
-                  />
-                  <Switch
-                    checked={notifications.marketingEmails}
-                    onChange={(e) => setNotifications({
-                      ...notifications,
-                      marketingEmails: e.target.checked
-                    })}
-                  />
-                </ListItem>
-
-                <ListItem>
-                  <ListItemText
-                    primary="Security Alerts"
-                    secondary="Get notified about security events"
-                  />
-                  <Switch
-                    checked={notifications.securityAlerts}
-                    onChange={(e) => setNotifications({
-                      ...notifications,
-                      securityAlerts: e.target.checked
-                    })}
-                  />
-                </ListItem>
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Privacy Settings */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" mb={3}>
-                <PrivacyIcon sx={{ mr: 1, color: 'primary.main' }} />
-                <Typography variant="h6">
-                  Privacy Settings
-                </Typography>
-              </Box>
-
-              <Typography variant="body2" color="text.secondary" mb={3}>
-                Control your privacy and data sharing preferences.
-              </Typography>
-
-              <List>
-                <ListItem>
-                  <ListItemText
-                    primary="Profile Visibility"
-                    secondary="Control who can see your profile"
-                  />
-                </ListItem>
-
-                <ListItem>
-                  <ListItemText
-                    primary="Show Email Address"
-                    secondary="Display your email to other users"
-                  />
-                  <Switch
-                    checked={privacy.showEmail}
-                    onChange={(e) => setPrivacy({
-                      ...privacy,
-                      showEmail: e.target.checked
-                    })}
-                  />
-                </ListItem>
-
-                <ListItem>
-                  <ListItemText
-                    primary="Show Phone Number"
-                    secondary="Display your phone number to other users"
-                  />
-                  <Switch
-                    checked={privacy.showPhone}
-                    onChange={(e) => setPrivacy({
-                      ...privacy,
-                      showPhone: e.target.checked
-                    })}
-                  />
-                </ListItem>
-
-                <ListItem>
-                  <ListItemText
-                    primary="Allow Search"
-                    secondary="Let others find you in search results"
-                  />
-                  <Switch
-                    checked={privacy.allowSearch}
-                    onChange={(e) => setPrivacy({
-                      ...privacy,
-                      allowSearch: e.target.checked
-                    })}
-                  />
-                </ListItem>
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Account Actions */}
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Account Actions
-              </Typography>
-
-              <Typography variant="body2" color="text.secondary" mb={3}>
-                Manage your account and data.
-              </Typography>
-
-              <List>
-                <ListItem>
-                  <ListItemText
-                    primary="Download My Data"
-                    secondary="Export all your data and information"
-                  />
-                  <Button variant="outlined" size="small">
-                    Download
-                  </Button>
-                </ListItem>
-
-                {/* Hide deactivate and delete for admin users */}
-                {session.user?.role !== 'ADMIN' && session.user?.role !== 'SUPERADMIN' && (
-                  <>
-                    <ListItem>
-                      <ListItemText
-                        primary="Deactivate Account"
-                        secondary="Temporarily disable your account"
-                      />
-                      <Button variant="outlined" color="warning" size="small">
-                        Deactivate
-                      </Button>
-                    </ListItem>
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <ListItem>
-                      <ListItemIcon>
-                        <DeleteIcon color="error" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary="Delete Account"
-                        secondary="Permanently delete your account and all data"
-                      />
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        size="small"
-                        onClick={() => setDeleteDialogOpen(true)}
-                      >
-                        Delete
-                      </Button>
-                    </ListItem>
-                  </>
-                )}
-
-                {/* Show message for admin users */}
-                {(session.user?.role === 'ADMIN' || session.user?.role === 'SUPERADMIN') && (
-                  <ListItem>
-                    <ListItemText
-                      primary="Account Protection"
-                      secondary="Admin accounts are protected from deletion and deactivation for security reasons"
-                      primaryTypographyProps={{ color: 'primary' }}
-                      secondaryTypographyProps={{ color: 'text.secondary' }}
-                    />
-                  </ListItem>
-                )}
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Delete Account Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Delete Account</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to permanently delete your account? This action cannot be undone.
+          <Typography variant="h4" component="h1">
+            Settings
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            All your data, files, and information will be permanently removed.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
-            Cancel
-          </Button>
           <Button
-            onClick={handleDeleteAccount}
-            color="error"
-            variant="contained"
-            disabled={loading}
+            startIcon={<ArrowBackIcon />}
+            onClick={() => router.push("/dashboard")}
           >
-            {loading ? 'Deleting...' : 'Delete Account'}
+            Back to Dashboard
           </Button>
-        </DialogActions>
-      </Dialog>
-    </Container>
-  )
+        </Box>
+
+        <Grid container spacing={4}>
+          {/* Security Settings */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Box display="flex" alignItems="center" gap={1} mb={3}>
+                  <SecurityIcon color="primary" />
+                  <Typography variant="h6">Security</Typography>
+                </Box>
+
+                <Typography variant="body2" color="text.secondary" mb={3}>
+                  Manage your account security settings
+                </Typography>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Current Password"
+                      type={showCurrentPassword ? "text" : "password"}
+                      value={passwordData.currentPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          currentPassword: e.target.value,
+                        })
+                      }
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() =>
+                                setShowCurrentPassword(!showCurrentPassword)
+                              }
+                              edge="end"
+                            >
+                              {showCurrentPassword ? (
+                                <VisibilityOffIcon />
+                              ) : (
+                                <VisibilityIcon />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="New Password"
+                      type={showNewPassword ? "text" : "password"}
+                      value={passwordData.newPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          newPassword: e.target.value,
+                        })
+                      }
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() =>
+                                setShowNewPassword(!showNewPassword)
+                              }
+                              edge="end"
+                            >
+                              {showNewPassword ? (
+                                <VisibilityOffIcon />
+                              ) : (
+                                <VisibilityIcon />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Confirm New Password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={passwordData.confirmPassword}
+                      onChange={(e) =>
+                        setPasswordData({
+                          ...passwordData,
+                          confirmPassword: e.target.value,
+                        })
+                      }
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() =>
+                                setShowConfirmPassword(!showConfirmPassword)
+                              }
+                              edge="end"
+                            >
+                              {showConfirmPassword ? (
+                                <VisibilityOffIcon />
+                              ) : (
+                                <VisibilityIcon />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Box mt={3}>
+                  <Button
+                    variant="contained"
+                    startIcon={<SaveIcon />}
+                    onClick={handlePasswordChange}
+                    disabled={loading || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                  >
+                    {loading ? "Updating..." : "Update Password"}
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Notification Settings */}
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <Box display="flex" alignItems="center" gap={1} mb={3}>
+                  <NotificationsIcon color="primary" />
+                  <Typography variant="h6">Notifications</Typography>
+                </Box>
+
+                <Typography variant="body2" color="text.secondary" mb={3}>
+                  Configure your notification preferences
+                </Typography>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={notificationSettings.emailNotifications}
+                          onChange={(e) =>
+                            setNotificationSettings({
+                              ...notificationSettings,
+                              emailNotifications: e.target.checked,
+                            })
+                          }
+                        />
+                      }
+                      label="Email Notifications"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={notificationSettings.pushNotifications}
+                          onChange={(e) =>
+                            setNotificationSettings({
+                              ...notificationSettings,
+                              pushNotifications: e.target.checked,
+                            })
+                          }
+                        />
+                      }
+                      label="Push Notifications"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={notificationSettings.marketingEmails}
+                          onChange={(e) =>
+                            setNotificationSettings({
+                              ...notificationSettings,
+                              marketingEmails: e.target.checked,
+                            })
+                          }
+                        />
+                      }
+                      label="Marketing Emails"
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={notificationSettings.securityAlerts}
+                          onChange={(e) =>
+                            setNotificationSettings({
+                              ...notificationSettings,
+                              securityAlerts: e.target.checked,
+                            })
+                          }
+                        />
+                      }
+                      label="Security Alerts"
+                    />
+                  </Grid>
+                </Grid>
+
+                <Box mt={3}>
+                  <Button
+                    variant="contained"
+                    startIcon={<SaveIcon />}
+                    onClick={handleNotificationSettingsChange}
+                    disabled={loading}
+                  >
+                    {loading ? "Saving..." : "Save Notification Settings"}
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* App Settings */}
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Box display="flex" alignItems="center" gap={1} mb={3}>
+                  <PaletteIcon color="primary" />
+                  <Typography variant="h6">Application Settings</Typography>
+                </Box>
+
+                <Typography variant="body2" color="text.secondary" mb={3}>
+                  Customize your application experience
+                </Typography>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={4}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={appSettings.darkMode}
+                          onChange={(e) =>
+                            setAppSettings({
+                              ...appSettings,
+                              darkMode: e.target.checked,
+                            })
+                          }
+                        />
+                      }
+                      label="Dark Mode"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={appSettings.autoSave}
+                          onChange={(e) =>
+                            setAppSettings({
+                              ...appSettings,
+                              autoSave: e.target.checked,
+                            })
+                          }
+                        />
+                      }
+                      label="Auto Save"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={appSettings.twoFactorAuth}
+                          onChange={(e) =>
+                            setAppSettings({
+                              ...appSettings,
+                              twoFactorAuth: e.target.checked,
+                            })
+                          }
+                        />
+                      }
+                      label="Two-Factor Authentication"
+                    />
+                  </Grid>
+                </Grid>
+
+                <Box mt={3}>
+                  <Button
+                    variant="contained"
+                    startIcon={<SaveIcon />}
+                    onClick={handleAppSettingsChange}
+                    disabled={loading}
+                  >
+                    {loading ? "Saving..." : "Save App Settings"}
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Container>
+    </AuthenticatedOnly>
+  );
 }
