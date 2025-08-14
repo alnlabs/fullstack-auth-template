@@ -31,6 +31,13 @@ enum AuthProvider {
   FIREBASE
 }
 
+enum DocumentCategory {
+  RESUME
+  PORTFOLIO
+  CERTIFICATE
+  OTHER
+}
+
 model User {
   id                    String      @id @default(cuid())
   email                 String      @unique
@@ -82,6 +89,7 @@ model User {
   sessions              Session[]
   refreshTokens         RefreshToken[]
   userLogs              UserLog[]
+  documents             UserDocument[]
 
   @@map("users")
 }
@@ -118,6 +126,22 @@ model UserLog {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_logs")
+}
+
+model UserDocument {
+  id          String           @id @default(cuid())
+  userId      String
+  fileName    String
+  filePath    String
+  fileSize    Int
+  fileType    String
+  category    DocumentCategory
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_documents")
 }
 
 model VerificationToken {

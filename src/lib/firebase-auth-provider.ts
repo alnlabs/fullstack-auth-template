@@ -98,11 +98,11 @@ export const firebaseAuthProvider: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider === 'google') {
+      if (account?.provider === "google") {
         try {
           // Check if user already exists
           const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! }
+            where: { email: user.email! },
           });
 
           if (existingUser) {
@@ -110,61 +110,63 @@ export const firebaseAuthProvider: NextAuthOptions = {
             await prisma.user.update({
               where: { id: existingUser.id },
               data: {
-                authProvider: 'GOOGLE',
+                authProvider: "GOOGLE",
                 providerId: account.providerAccountId,
                 providerData: {
                   googleId: account.providerAccountId,
                   picture: user.image,
-                  locale: (profile as any)?.locale
+                  locale: (profile as any)?.locale,
                 },
                 avatar: user.image,
                 emailVerified: true,
-                status: 'ACTIVE'
-              }
+                status: "ACTIVE",
+              },
             });
 
             // Log Google sign-in
             await AuthUtils.logUserAction({
               userId: existingUser.id,
-              action: 'LOGIN_SUCCESS',
-              details: { method: 'google', provider: 'GOOGLE' }
+              action: "LOGIN_SUCCESS",
+              details: { method: "google", provider: "GOOGLE" },
             });
           } else {
             // Generate unique username for Google user
-            const baseUsername = user.email!.split('@')[0];
-            const username = await AuthUtils.generateUniqueUsername(baseUsername);
-            
+            const baseUsername = user.email!.split("@")[0];
+            const username = await AuthUtils.generateUniqueUsername(
+              baseUsername
+            );
+
             // Create new user from Google
             const newUser = await prisma.user.create({
               data: {
                 email: user.email!,
                 username: username,
-                firstName: user.name?.split(' ')[0] || '',
-                lastName: user.name?.split(' ').slice(1).join(' ') || '',
-                displayName: user.name || '',
-                avatar: user.image || '',
-                role: 'USER',
-                status: 'ACTIVE',
+                firstName: user.name?.split(" ")[0] || "",
+                lastName: user.name?.split(" ").slice(1).join(" ") || "",
+                displayName: user.name || "",
+                avatar: user.image || "",
+                role: "USER",
+                status: "ACTIVE",
                 emailVerified: true,
-                authProvider: 'GOOGLE',
+                authProvider: "GOOGLE",
                 providerId: account.providerAccountId,
                 providerData: {
                   googleId: account.providerAccountId,
                   picture: user.image,
-                  locale: (profile as any)?.locale
-                }
-              }
+                  locale: (profile as any)?.locale,
+                },
+              },
             });
 
             // Log user creation
             await AuthUtils.logUserAction({
               userId: newUser.id,
-              action: 'USER_CREATED',
-              details: { method: 'google', provider: 'GOOGLE' }
+              action: "USER_CREATED",
+              details: { method: "google", provider: "GOOGLE" },
             });
           }
         } catch (error) {
-          console.error('Google sign-in error:', error);
+          console.error("Google sign-in error:", error);
           return false;
         }
       }
