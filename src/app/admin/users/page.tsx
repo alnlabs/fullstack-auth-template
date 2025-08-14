@@ -113,11 +113,7 @@ export default function AdminUsersPage() {
 
   return (
     <AdminLayout>
-      <TabContent
-        title="User Management"
-        subtitle="Manage users, roles, and permissions"
-        rightControls={rightControls}
-      >
+      <TabContent rightControls={rightControls}>
         {/* Users Table */}
         <Card sx={spacing.card}>
           <CardContent>
