@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Mulish } from "next/font/google";
+import { Work_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "react-hot-toast";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import Providers from "@/components/providers/Providers";
 
-const mulish = Mulish({
+const workSans = Work_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
@@ -25,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={mulish.className}>
+      <body className={workSans.className}>
         <Providers>
           <AuthProvider>
             {children}

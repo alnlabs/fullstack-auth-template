@@ -1,26 +1,26 @@
-import { createTheme } from '@mui/material/styles'
+import { createTheme } from "@mui/material/styles";
 
 export const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
+      main: "#1976d2",
     },
     secondary: {
-      main: '#dc004e',
+      main: "#dc004e",
     },
   },
   typography: {
     fontFamily: [
-      'Mulish',
-      '-apple-system',
-      'BlinkMacSystemFont',
+      "Work Sans",
+      "-apple-system",
+      "BlinkMacSystemFont",
       '"Segoe UI"',
-      'Roboto',
-      'Arial',
-      'sans-serif',
-    ].join(','),
+      "Roboto",
+      "Arial",
+      "sans-serif",
+    ].join(","),
     button: {
-      textTransform: 'none',
+      textTransform: "none",
       fontWeight: 600,
     },
     h1: {
@@ -50,7 +50,7 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 8,
-          padding: '10px 24px',
+          padding: "10px 24px",
           fontWeight: 600,
         },
       },
@@ -58,7 +58,7 @@ export const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-          '& .MuiOutlinedInput-root': {
+          "& .MuiOutlinedInput-root": {
             borderRadius: 8,
           },
         },
@@ -68,9 +68,9 @@ export const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 12,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         },
       },
     },
   },
-})
+});
