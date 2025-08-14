@@ -22,7 +22,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <AdminOnly>
-      <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      <Box sx={{ display: "flex", minHeight: "100vh", overflow: "hidden" }}>
         <AdminHeader onMenuClick={toggleSidebar} />
         <AdminSidebar
           open={sidebarOpen}
@@ -35,10 +35,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           sx={{
             flexGrow: 1,
             minHeight: "100vh",
-            width: `calc(100vw - ${
-              sidebarOpen ? drawerWidth : collapsedDrawerWidth
-            }px)`,
             maxWidth: "none",
+            overflow: "auto",
           }}
         >
           <Toolbar />
