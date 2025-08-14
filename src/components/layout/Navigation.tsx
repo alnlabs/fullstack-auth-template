@@ -20,9 +20,11 @@ import {
   Settings as SettingsIcon,
   Logout as LogoutIcon,
   Upload as UploadIcon,
+  Science as DemoIcon,
 } from "@mui/icons-material";
 import { useState } from "react";
-import { User, useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/lib/auth-context";
+import { User } from "@/lib/auth";
 
 interface NavigationProps {
   user: User;
@@ -45,6 +47,7 @@ export default function Navigation({ user }: NavigationProps) {
   const handleLogout = async () => {
     await logout();
     handleClose();
+    // Toast notifications are handled by the auth context
   };
 
   const getRoleColor = (role: string) => {
@@ -129,6 +132,21 @@ export default function Navigation({ user }: NavigationProps) {
             }}
           >
             Settings
+          </Button>
+
+          {/* Demo Link */}
+          <Button
+            color="inherit"
+            startIcon={<DemoIcon />}
+            onClick={() => router.push("/demo")}
+            sx={{
+              backgroundColor:
+                pathname === "/demo"
+                  ? "rgba(255,255,255,0.1)"
+                  : "transparent",
+            }}
+          >
+            Demo
           </Button>
         </Box>
 

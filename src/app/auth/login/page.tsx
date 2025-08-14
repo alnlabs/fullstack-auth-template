@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import {
   Box,
@@ -11,41 +10,30 @@ import {
   Button,
   Card,
   CardContent,
-  Alert,
   Link,
   Divider,
 } from "@mui/material";
 import {
   Login as LoginIcon,
-  ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
 
 export default function LoginPage() {
-  const router = useRouter();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
     emailOrUsername: "",
     password: "",
   });
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
-      const success = await login(formData.emailOrUsername, formData.password);
-
-      if (success) {
-        // Redirect based on user role - this will be handled by the auth context
-        // The user will be automatically redirected based on their role
-      } else {
-        setError("Invalid credentials");
-      }
+      await login(formData.emailOrUsername, formData.password);
+      // Toast notifications are handled by the auth context
     } catch (error) {
-      setError("An error occurred. Please try again.");
+      // Error handling is done by the auth context
     } finally {
       setLoading(false);
     }
@@ -63,12 +51,6 @@ export default function LoginPage() {
               Sign in to your account
             </Typography>
           </Box>
-
-          {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {error}
-            </Alert>
-          )}
 
           <form onSubmit={handleSubmit}>
             <TextField

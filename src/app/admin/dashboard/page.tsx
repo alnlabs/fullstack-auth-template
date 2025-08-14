@@ -40,6 +40,7 @@ export default function AdminDashboardPage() {
 
   const handleLogout = async () => {
     await logout();
+    // Toast notifications are handled by the auth context
   };
 
   const getRoleColor = (role: string) => {

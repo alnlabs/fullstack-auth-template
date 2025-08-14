@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { User } from "./auth";
+import { ToastUtils, ToastMessages } from "./toast";
 
 interface AuthContextType {
   user: User | null;
@@ -67,11 +68,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        ToastUtils.error(errorData.error || ToastMessages.auth.loginError);
         return false;
       }
 
       const data = await response.json();
       setUser(data.user);
+
+      // Show success toast
+      ToastUtils.success(ToastMessages.auth.loginSuccess);
 
       // Redirect based on user role
       if (data.user.role === "SUPERADMIN" || data.user.role === "ADMIN") {
@@ -83,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return true;
     } catch (error) {
       console.error("Login error:", error);
+      ToastUtils.error(ToastMessages.auth.loginError);
       return false;
     } finally {
       setLoading(false);
@@ -91,12 +98,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch("/api/auth/logout", {
+      const response = await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });
+
+      if (response.ok) {
+        ToastUtils.success(ToastMessages.auth.logoutSuccess);
+      } else {
+        ToastUtils.error(ToastMessages.auth.logoutError);
+      }
     } catch (error) {
       console.error("Logout error:", error);
+      ToastUtils.error(ToastMessages.auth.logoutError);
     } finally {
       setUser(null);
       router.push("/auth/login");
