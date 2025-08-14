@@ -33,7 +33,11 @@ const menuItems = [
   { text: "Security", icon: SecurityIcon, path: "/admin/security" },
 ];
 
-export default function AdminSidebar({ open, drawerWidth, collapsedWidth }: AdminSidebarProps) {
+export default function AdminSidebar({
+  open,
+  drawerWidth,
+  collapsedWidth,
+}: AdminSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -58,14 +62,20 @@ export default function AdminSidebar({ open, drawerWidth, collapsedWidth }: Admi
           height: "calc(100vh - 64px)",
           overflowX: "hidden",
           transition: "width 0.2s",
+          position: "fixed",
+          left: 0,
         },
       }}
     >
       <Box sx={{ overflow: "auto", mt: 1 }}>
         <List>
           <ListItem disablePadding>
-            <Tooltip title="Back to Site" placement="right" disableHoverListener={open}>
-              <ListItemButton 
+            <Tooltip
+              title="Back to Site"
+              placement="right"
+              disableHoverListener={open}
+            >
+              <ListItemButton
                 onClick={handleHome}
                 sx={{
                   minHeight: 48,
@@ -97,7 +107,11 @@ export default function AdminSidebar({ open, drawerWidth, collapsedWidth }: Admi
 
             return (
               <ListItem key={item.text} disablePadding>
-                <Tooltip title={item.text} placement="right" disableHoverListener={open}>
+                <Tooltip
+                  title={item.text}
+                  placement="right"
+                  disableHoverListener={open}
+                >
                   <ListItemButton
                     onClick={() => handleNavigation(item.path)}
                     selected={isActive}

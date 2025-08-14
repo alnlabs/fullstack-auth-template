@@ -23,33 +23,42 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <AdminOnly>
-      <Box sx={{ display: "flex", height: "100vh" }}>
+      <Box className="admin-layout" sx={{ display: "flex" }}>
         <AdminHeader onMenuClick={toggleSidebar} />
-        <AdminSidebar 
-          open={sidebarOpen} 
+        <AdminSidebar
+          open={sidebarOpen}
           drawerWidth={drawerWidth}
           collapsedWidth={collapsedDrawerWidth}
         />
-        
+
         <Box
           component="main"
+          className="admin-content"
           sx={{
             flexGrow: 1,
-            height: "100vh",
-            overflow: "auto",
-            display: "flex",
-            flexDirection: "column",
-            width: { 
-              sm: `calc(100% - ${sidebarOpen ? drawerWidth : collapsedDrawerWidth}px)` 
+            width: {
+              sm: `calc(100vw - ${
+                sidebarOpen ? drawerWidth : collapsedDrawerWidth
+              }px)`,
             },
-            ml: { 
-              sm: `${sidebarOpen ? drawerWidth : collapsedDrawerWidth}px` 
+            ml: {
+              sm: `${sidebarOpen ? drawerWidth : collapsedDrawerWidth}px`,
             },
             transition: "width 0.2s, margin-left 0.2s",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
           <Toolbar /> {/* Spacer for AppBar */}
-          <Box sx={{ flex: 1, p: 3, overflow: "auto" }}>
+          <Box 
+            sx={{ 
+              flex: 1, 
+              p: 3, 
+              overflow: "auto",
+              width: "100%",
+              height: "100%",
+            }}
+          >
             {children}
           </Box>
         </Box>

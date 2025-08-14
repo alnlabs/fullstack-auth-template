@@ -12,3 +12,25 @@
   outline: 2px solid #1976d2;
   outline-offset: 2px;
 }
+
+/* Ensure full height for admin layout */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#__next {
+  height: 100%;
+}
+
+/* Admin layout specific styles */
+.admin-layout {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.admin-content {
+  height: 100%;
+  overflow: auto;
+}
