@@ -27,13 +27,13 @@ export default function TabContent({
           {(title || subtitle) && (
             <Box>
               {title && (
-                <Typography variant="h3" component="h1" fontWeight={700}>
+                <Typography variant="h4" component="h1" fontWeight={600}>
                   {title}
                 </Typography>
               )}
               {subtitle && (
                 <Typography
-                  variant="h6"
+                  variant="body1"
                   color="text.secondary"
                   sx={{ mt: 1, fontWeight: 400 }}
                 >
