@@ -9,7 +9,6 @@ import {
   Button,
   Card,
   CardContent,
-  Grid,
   Avatar,
   Chip,
   Divider,
@@ -47,7 +46,7 @@ export default function DashboardPage() {
 
   return (
     <AuthenticatedOnly>
-      <Box sx={{ p: 3, maxWidth: "100%", overflow: "hidden" }}>
+      <Box sx={{ p: 3, width: 1, maxWidth: "none", overflow: "hidden" }}>
         {/* Header */}
         <Box
           display="flex"
@@ -105,8 +104,16 @@ export default function DashboardPage() {
         </Card>
 
         {/* Quick Actions */}
-        <Grid container spacing={3} mb={4}>
-          <Grid item xs={12} md={3}>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            mb: 4,
+            width: 1,
+          }}
+        >
+          <Box sx={{ flex: "1 1 250px", minWidth: "250px" }}>
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
                 <PersonIcon
@@ -126,9 +133,9 @@ export default function DashboardPage() {
                 </Button>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
 
-          <Grid item xs={12} md={3}>
+          <Box sx={{ flex: "1 1 250px", minWidth: "250px" }}>
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
                 <UploadIcon
@@ -148,9 +155,9 @@ export default function DashboardPage() {
                 </Button>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
 
-          <Grid item xs={12} md={3}>
+          <Box sx={{ flex: "1 1 250px", minWidth: "250px" }}>
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
                 <SettingsIcon
@@ -170,14 +177,12 @@ export default function DashboardPage() {
                 </Button>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
 
-          <Grid item xs={12} md={3}>
+          <Box sx={{ flex: "1 1 250px", minWidth: "250px" }}>
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
-                <LogoutIcon
-                  sx={{ fontSize: 48, color: "error.main", mb: 2 }}
-                />
+                <LogoutIcon sx={{ fontSize: 48, color: "error.main", mb: 2 }} />
                 <Typography variant="h6" gutterBottom>
                   Logout
                 </Typography>
@@ -193,8 +198,8 @@ export default function DashboardPage() {
                 </Button>
               </CardContent>
             </Card>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
 
         {/* Recent Activity */}
         <Card>
