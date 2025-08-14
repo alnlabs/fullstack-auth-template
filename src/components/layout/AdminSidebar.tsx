@@ -79,9 +79,16 @@ export default function AdminSidebar({ open, drawerWidth, collapsedWidth }: Admi
                       justifyContent: open ? "initial" : "center",
                       px: 2.5,
                       "&.Mui-selected": {
-                        backgroundColor: "primary.light",
+                        backgroundColor: "primary.main",
+                        color: "white",
                         "&:hover": {
-                          backgroundColor: "primary.light",
+                          backgroundColor: "primary.dark",
+                        },
+                        "& .MuiListItemIcon-root": {
+                          color: "white",
+                        },
+                        "& .MuiListItemText-primary": {
+                          color: "white",
                         },
                       },
                     }}
@@ -93,7 +100,7 @@ export default function AdminSidebar({ open, drawerWidth, collapsedWidth }: Admi
                         justifyContent: "center",
                       }}
                     >
-                      <Icon color={isActive ? "primary" : "inherit"} />
+                      <Icon color={isActive ? "inherit" : "inherit"} />
                     </ListItemIcon>
                     {open && <ListItemText primary={item.text} />}
                   </ListItemButton>
