@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
+import { PT_Sans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "react-hot-toast";
 import PerformanceMonitor from "@/components/PerformanceMonitor";
 import Providers from "@/components/providers/Providers";
 
-const roboto = Roboto({
+const ptSans = PT_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
+  weight: ["400", "700"],
   display: "swap",
 });
 
@@ -25,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={roboto.className}>
+      <body className={ptSans.className}>
         <Providers>
           <AuthProvider>
             {children}
