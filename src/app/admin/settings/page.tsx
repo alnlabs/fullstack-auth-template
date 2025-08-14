@@ -37,17 +37,17 @@ export default function AdminSettingsPage() {
     emailNotifications: true,
     pushNotifications: false,
     systemAlerts: true,
-    
+
     // Security Settings
     twoFactorAuth: false,
     sessionTimeout: 30,
     passwordPolicy: "strong",
-    
+
     // System Settings
     maintenanceMode: false,
     debugMode: false,
     autoBackup: true,
-    
+
     // Appearance Settings
     theme: "light",
     language: "en",
@@ -57,13 +57,13 @@ export default function AdminSettingsPage() {
   const [saved, setSaved] = useState(false);
 
   const handleSettingChange = (key: string, value: any) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+    setSettings((prev) => ({ ...prev, [key]: value }));
     setSaved(false);
   };
 
   const handleSave = async () => {
     // Simulate saving settings
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
@@ -73,11 +73,7 @@ export default function AdminSettingsPage() {
   }
 
   const rightControls = (
-    <Button 
-      variant="contained" 
-      onClick={handleSave}
-      disabled={saved}
-    >
+    <Button variant="contained" onClick={handleSave} disabled={saved}>
       {saved ? "Saved!" : "Save Settings"}
     </Button>
   );
@@ -105,13 +101,18 @@ export default function AdminSettingsPage() {
                   Notification Settings
                 </Typography>
               </Box>
-              
+
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <FormControlLabel
                   control={
                     <Switch
                       checked={settings.emailNotifications}
-                      onChange={(e) => handleSettingChange("emailNotifications", e.target.checked)}
+                      onChange={(e) =>
+                        handleSettingChange(
+                          "emailNotifications",
+                          e.target.checked
+                        )
+                      }
                     />
                   }
                   label="Email Notifications"
@@ -120,7 +121,12 @@ export default function AdminSettingsPage() {
                   control={
                     <Switch
                       checked={settings.pushNotifications}
-                      onChange={(e) => handleSettingChange("pushNotifications", e.target.checked)}
+                      onChange={(e) =>
+                        handleSettingChange(
+                          "pushNotifications",
+                          e.target.checked
+                        )
+                      }
                     />
                   }
                   label="Push Notifications"
@@ -129,7 +135,9 @@ export default function AdminSettingsPage() {
                   control={
                     <Switch
                       checked={settings.systemAlerts}
-                      onChange={(e) => handleSettingChange("systemAlerts", e.target.checked)}
+                      onChange={(e) =>
+                        handleSettingChange("systemAlerts", e.target.checked)
+                      }
                     />
                   }
                   label="System Alerts"
@@ -147,24 +155,28 @@ export default function AdminSettingsPage() {
                   Security Settings
                 </Typography>
               </Box>
-              
+
               <Box sx={{ display: "grid", gap: 3 }}>
                 <FormControlLabel
                   control={
                     <Switch
                       checked={settings.twoFactorAuth}
-                      onChange={(e) => handleSettingChange("twoFactorAuth", e.target.checked)}
+                      onChange={(e) =>
+                        handleSettingChange("twoFactorAuth", e.target.checked)
+                      }
                     />
                   }
                   label="Two-Factor Authentication"
                 />
-                
+
                 <FormControl fullWidth>
                   <InputLabel>Session Timeout (minutes)</InputLabel>
                   <Select
                     value={settings.sessionTimeout}
                     label="Session Timeout (minutes)"
-                    onChange={(e) => handleSettingChange("sessionTimeout", e.target.value)}
+                    onChange={(e) =>
+                      handleSettingChange("sessionTimeout", e.target.value)
+                    }
                   >
                     <MenuItem value={15}>15 minutes</MenuItem>
                     <MenuItem value={30}>30 minutes</MenuItem>
@@ -172,13 +184,15 @@ export default function AdminSettingsPage() {
                     <MenuItem value={120}>2 hours</MenuItem>
                   </Select>
                 </FormControl>
-                
+
                 <FormControl fullWidth>
                   <InputLabel>Password Policy</InputLabel>
                   <Select
                     value={settings.passwordPolicy}
                     label="Password Policy"
-                    onChange={(e) => handleSettingChange("passwordPolicy", e.target.value)}
+                    onChange={(e) =>
+                      handleSettingChange("passwordPolicy", e.target.value)
+                    }
                   >
                     <MenuItem value="basic">Basic</MenuItem>
                     <MenuItem value="strong">Strong</MenuItem>
@@ -198,13 +212,15 @@ export default function AdminSettingsPage() {
                   System Settings
                 </Typography>
               </Box>
-              
+
               <Box sx={{ display: "grid", gap: 3 }}>
                 <FormControlLabel
                   control={
                     <Switch
                       checked={settings.maintenanceMode}
-                      onChange={(e) => handleSettingChange("maintenanceMode", e.target.checked)}
+                      onChange={(e) =>
+                        handleSettingChange("maintenanceMode", e.target.checked)
+                      }
                     />
                   }
                   label="Maintenance Mode"
@@ -213,7 +229,9 @@ export default function AdminSettingsPage() {
                   control={
                     <Switch
                       checked={settings.debugMode}
-                      onChange={(e) => handleSettingChange("debugMode", e.target.checked)}
+                      onChange={(e) =>
+                        handleSettingChange("debugMode", e.target.checked)
+                      }
                     />
                   }
                   label="Debug Mode"
@@ -222,7 +240,9 @@ export default function AdminSettingsPage() {
                   control={
                     <Switch
                       checked={settings.autoBackup}
-                      onChange={(e) => handleSettingChange("autoBackup", e.target.checked)}
+                      onChange={(e) =>
+                        handleSettingChange("autoBackup", e.target.checked)
+                      }
                     />
                   }
                   label="Automatic Backup"
@@ -240,27 +260,31 @@ export default function AdminSettingsPage() {
                   Appearance Settings
                 </Typography>
               </Box>
-              
+
               <Box sx={{ display: "grid", gap: 3 }}>
                 <FormControl fullWidth>
                   <InputLabel>Theme</InputLabel>
                   <Select
                     value={settings.theme}
                     label="Theme"
-                    onChange={(e) => handleSettingChange("theme", e.target.value)}
+                    onChange={(e) =>
+                      handleSettingChange("theme", e.target.value)
+                    }
                   >
                     <MenuItem value="light">Light</MenuItem>
                     <MenuItem value="dark">Dark</MenuItem>
                     <MenuItem value="auto">Auto</MenuItem>
                   </Select>
                 </FormControl>
-                
+
                 <FormControl fullWidth>
                   <InputLabel>Language</InputLabel>
                   <Select
                     value={settings.language}
                     label="Language"
-                    onChange={(e) => handleSettingChange("language", e.target.value)}
+                    onChange={(e) =>
+                      handleSettingChange("language", e.target.value)
+                    }
                   >
                     <MenuItem value="en">English</MenuItem>
                     <MenuItem value="es">Spanish</MenuItem>
@@ -268,13 +292,15 @@ export default function AdminSettingsPage() {
                     <MenuItem value="de">German</MenuItem>
                   </Select>
                 </FormControl>
-                
+
                 <FormControl fullWidth>
                   <InputLabel>Timezone</InputLabel>
                   <Select
                     value={settings.timezone}
                     label="Timezone"
-                    onChange={(e) => handleSettingChange("timezone", e.target.value)}
+                    onChange={(e) =>
+                      handleSettingChange("timezone", e.target.value)
+                    }
                   >
                     <MenuItem value="UTC">UTC</MenuItem>
                     <MenuItem value="EST">Eastern Time</MenuItem>
