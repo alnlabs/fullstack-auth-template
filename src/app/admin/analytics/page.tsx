@@ -1,272 +1,90 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
+import { Grid } from "@mui/material";
 import {
-  Box,
-  Container,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  CircularProgress,
-  Chip,
-  Divider,
-  Button,
-} from "@mui/material";
-import {
-  ArrowBack as ArrowBackIcon,
   People as PeopleIcon,
-  Storage as StorageIcon,
   TrendingUp as TrendingUpIcon,
+  Storage as StorageIcon,
   Security as SecurityIcon,
 } from "@mui/icons-material";
-import { AdminOnly } from "@/lib/route-guard";
-import { useAuth } from "@/lib/auth-context";
-
-interface AnalyticsData {
-  totalUsers: number;
-  activeUsers: number;
-  totalFiles: number;
-  totalStorage: number;
-  recentLogins: number;
-  systemHealth: "good" | "warning" | "error";
-}
+import AdminLayout from "@/components/layout/AdminLayout";
+import StatCard from "@/components/widgets/StatCard";
+import PageHeader from "@/components/widgets/PageHeader";
 
 export default function AdminAnalyticsPage() {
   const { user } = useAuth();
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
 
   if (!user) {
-    return null; // RouteGuard will handle the redirect
-  }
-
-  useEffect(() => {
-    fetchAnalytics();
-  }, []);
-
-  const fetchAnalytics = async () => {
-    try {
-      const response = await fetch("/api/admin/analytics", {
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setAnalytics(data);
-      } else {
-        // Mock data for demo purposes
-        setAnalytics({
-          totalUsers: 1250,
-          activeUsers: 847,
-          totalFiles: 3420,
-          totalStorage: 2.4, // GB
-          recentLogins: 156,
-          systemHealth: "good",
-        });
-      }
-    } catch (error) {
-      // Mock data for demo purposes
-      setAnalytics({
-        totalUsers: 1250,
-        activeUsers: 847,
-        totalFiles: 3420,
-        totalStorage: 2.4,
-        recentLogins: 156,
-        systemHealth: "good",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getSystemHealthColor = (health: string) => {
-    switch (health) {
-      case "good":
-        return "success";
-      case "warning":
-        return "warning";
-      case "error":
-        return "error";
-      default:
-        return "default";
-    }
-  };
-
-  if (loading) {
-    return (
-      <AdminOnly>
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-            <CircularProgress />
-          </Box>
-        </Container>
-      </AdminOnly>
-    );
+    return null;
   }
 
   return (
-    <AdminOnly>
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        {/* Header */}
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={4}
-        >
-          <Typography variant="h4" component="h1">
-            Analytics Dashboard
-          </Typography>
-          <Box display="flex" gap={2}>
-            <Button
-              startIcon={<ArrowBackIcon />}
-              onClick={() => router.push("/admin/dashboard")}
-            >
-              Back to Dashboard
-            </Button>
-          </Box>
-        </Box>
+    <AdminLayout>
+      <PageHeader
+        title="Analytics"
+        subtitle="System analytics and performance metrics"
+      />
 
-        {analytics && (
-          <>
-            {/* Key Metrics */}
-            <Grid container spacing={3} mb={4}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Card>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={2}>
-                      <PeopleIcon color="primary" sx={{ fontSize: 40 }} />
-                      <Box>
-                        <Typography variant="h4" fontWeight="bold">
-                          {analytics.totalUsers.toLocaleString()}
-                        </Typography>
-                        <Typography color="text.secondary">
-                          Total Users
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
+      {/* Key Metrics */}
+      <Grid container spacing={3} mb={4}>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Total Users"
+            value="1,234"
+            icon={<PeopleIcon sx={{ fontSize: 40 }} />}
+            color="primary"
+            subtitle="+12% from last month"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Active Users"
+            value="89"
+            icon={<TrendingUpIcon sx={{ fontSize: 40 }} />}
+            color="success"
+            subtitle="Currently online"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Storage Used"
+            value="2.4GB"
+            icon={<StorageIcon sx={{ fontSize: 40 }} />}
+            color="warning"
+            subtitle="of 10GB total"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Security Score"
+            value="98%"
+            icon={<SecurityIcon sx={{ fontSize: 40 }} />}
+            color="info"
+            subtitle="Excellent security"
+          />
+        </Grid>
+      </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
-                <Card>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={2}>
-                      <TrendingUpIcon color="success" sx={{ fontSize: 40 }} />
-                      <Box>
-                        <Typography variant="h4" fontWeight="bold">
-                          {analytics.activeUsers.toLocaleString()}
-                        </Typography>
-                        <Typography color="text.secondary">
-                          Active Users
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                <Card>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={2}>
-                      <StorageIcon color="info" sx={{ fontSize: 40 }} />
-                      <Box>
-                        <Typography variant="h4" fontWeight="bold">
-                          {analytics.totalFiles.toLocaleString()}
-                        </Typography>
-                        <Typography color="text.secondary">
-                          Total Files
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                <Card>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={2}>
-                      <SecurityIcon color="warning" sx={{ fontSize: 40 }} />
-                      <Box>
-                        <Typography variant="h4" fontWeight="bold">
-                          {analytics.recentLogins}
-                        </Typography>
-                        <Typography color="text.secondary">
-                          Recent Logins
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-
-            {/* System Status */}
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      System Status
-                    </Typography>
-                    <Divider sx={{ mb: 2 }} />
-                    <Box display="flex" alignItems="center" gap={2} mb={2}>
-                      <Chip
-                        label={`System Health: ${analytics.systemHealth.toUpperCase()}`}
-                        color={getSystemHealthColor(analytics.systemHealth)}
-                      />
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      All systems are operating normally. No issues detected.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Storage Usage
-                    </Typography>
-                    <Divider sx={{ mb: 2 }} />
-                    <Box display="flex" alignItems="center" gap={2} mb={2}>
-                      <Typography variant="h4" fontWeight="bold">
-                        {analytics.totalStorage} GB
-                      </Typography>
-                      <Typography color="text.secondary">
-                        of storage used
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Storage usage is within normal limits.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
-
-            {/* Recent Activity */}
-            <Card sx={{ mt: 4 }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Recent Activity
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                <Typography color="text.secondary">
-                  No recent activity to display.
-                </Typography>
-              </CardContent>
-            </Card>
-          </>
-        )}
-      </Container>
-    </AdminOnly>
+      {/* Additional Analytics */}
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={6}>
+          <StatCard
+            title="Recent Logins"
+            value="156"
+            color="secondary"
+            subtitle="Last 24 hours"
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <StatCard
+            title="System Uptime"
+            value="99.9%"
+            color="success"
+            subtitle="Last 30 days"
+          />
+        </Grid>
+      </Grid>
+    </AdminLayout>
   );
 }

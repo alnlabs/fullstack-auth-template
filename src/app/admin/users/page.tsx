@@ -1,14 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
 import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Card,
-  CardContent,
   Table,
   TableBody,
   TableCell,
@@ -16,8 +10,9 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Chip,
   IconButton,
+  Chip,
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -27,51 +22,38 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Alert,
-  CircularProgress,
-  Grid,
+  Box,
 } from "@mui/material";
 import {
-  Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  ArrowBack as ArrowBackIcon,
-  Refresh as RefreshIcon,
+  Add as AddIcon,
 } from "@mui/icons-material";
-import { AdminOnly } from "@/lib/route-guard";
-import { useAuth } from "@/lib/auth-context";
-import { ToastUtils, ToastMessages } from "@/lib/toast";
+import AdminLayout from "@/components/layout/AdminLayout";
+import PageHeader from "@/components/widgets/PageHeader";
+import { ToastUtils } from "@/lib/toast";
 
 interface User {
   id: string;
+  name: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  role: "USER" | "ADMIN" | "SUPERADMIN";
-  status: "ACTIVE" | "INACTIVE" | "SUSPENDED" | "PENDING_VERIFICATION";
+  role: string;
+  status: string;
   createdAt: string;
-  lastLoginAt?: string;
 }
 
 export default function AdminUsersPage() {
   const { user } = useAuth();
-  const router = useRouter();
-
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
     email: "",
-    role: "USER" as const,
-    status: "ACTIVE" as const,
+    role: "",
+    status: "",
   });
-
-  if (!user) {
-    return null; // RouteGuard will handle the redirect
-  }
 
   useEffect(() => {
     fetchUsers();
@@ -79,63 +61,56 @@ export default function AdminUsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("/api/admin/users", {
-        credentials: "include",
-      });
-
+      setLoading(true);
+      const response = await fetch("/api/admin/users");
       if (response.ok) {
         const data = await response.json();
-        setUsers(data.users);
+        setUsers(data.users || []);
       } else {
         ToastUtils.error("Failed to fetch users");
       }
     } catch (error) {
-      ToastUtils.error("Failed to fetch users");
+      ToastUtils.error("Error fetching users");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEditUser = (user: User) => {
-    setEditingUser(user);
-    setFormData({
-      firstName: user.firstName,
-      lastName: user.lastName,
+  const handleEdit = (user: User) => {
+    setSelectedUser(user);
+    setEditForm({
+      name: user.name,
       email: user.email,
       role: user.role,
       status: user.status,
     });
-    setDialogOpen(true);
+    setEditDialogOpen(true);
   };
 
-  const handleSaveUser = async () => {
-    if (!editingUser) return;
+  const handleSave = async () => {
+    if (!selectedUser) return;
 
     try {
-      const response = await fetch(`/api/admin/users/${editingUser.id}`, {
+      const response = await fetch(`/api/admin/users/${selectedUser.id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editForm),
       });
 
       if (response.ok) {
-        ToastUtils.success(ToastMessages.admin.userUpdated);
-        setDialogOpen(false);
-        setEditingUser(null);
+        ToastUtils.success("User updated successfully");
+        setEditDialogOpen(false);
         fetchUsers();
       } else {
-        const data = await response.json();
-        ToastUtils.error(data.error || ToastMessages.admin.userActionError);
+        ToastUtils.error("Failed to update user");
       }
     } catch (error) {
-      ToastUtils.error(ToastMessages.admin.userActionError);
+      ToastUtils.error("Error updating user");
     }
   };
 
-  const handleDeleteUser = async (userId: string, userName: string) => {
-    if (!confirm(`Are you sure you want to delete ${userName}?`)) return;
+  const handleDelete = async (userId: string) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
@@ -143,14 +118,13 @@ export default function AdminUsersPage() {
       });
 
       if (response.ok) {
-        ToastUtils.success(ToastMessages.admin.userDeleted);
+        ToastUtils.success("User deleted successfully");
         fetchUsers();
       } else {
-        const data = await response.json();
-        ToastUtils.error(data.error || ToastMessages.admin.userActionError);
+        ToastUtils.error("Failed to delete user");
       }
     } catch (error) {
-      ToastUtils.error(ToastMessages.admin.userActionError);
+      ToastUtils.error("Error deleting user");
     }
   };
 
@@ -170,205 +144,144 @@ export default function AdminUsersPage() {
       case "ACTIVE":
         return "success";
       case "INACTIVE":
-        return "default";
-      case "SUSPENDED":
         return "error";
-      case "PENDING_VERIFICATION":
-        return "warning";
       default:
         return "default";
     }
   };
 
-  if (loading) {
-    return (
-      <AdminOnly>
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-            <CircularProgress />
-          </Box>
-        </Container>
-      </AdminOnly>
-    );
-  }
+  if (!user) return null;
 
   return (
-    <AdminOnly>
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
-        {/* Header */}
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={4}
-        >
-          <Typography variant="h4" component="h1">
-            User Management
-          </Typography>
-          <Box display="flex" gap={2}>
-            <Button
-              startIcon={<RefreshIcon />}
-              onClick={fetchUsers}
-            >
-              Refresh
-            </Button>
-            <Button
-              startIcon={<ArrowBackIcon />}
-              onClick={() => router.push("/admin/dashboard")}
-            >
-              Back to Dashboard
-            </Button>
+    <AdminLayout>
+      <PageHeader
+        title="User Management"
+        subtitle="Manage users, roles, and permissions"
+        action={
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => ToastUtils.info("Add user functionality coming soon")}
+          >
+            Add User
+          </Button>
+        }
+      />
+
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Role</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Created</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>
+                  <Chip
+                    label={user.role}
+                    color={getRoleColor(user.role)}
+                    size="small"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={user.status}
+                    color={getStatusColor(user.status)}
+                    size="small"
+                  />
+                </TableCell>
+                <TableCell>
+                  {new Date(user.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleEdit(user)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => handleDelete(user.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
+        <DialogTitle>Edit User</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 1 }}>
+            <TextField
+              fullWidth
+              label="Name"
+              value={editForm.name}
+              onChange={(e) =>
+                setEditForm({ ...editForm, name: e.target.value })
+              }
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Email"
+              value={editForm.email}
+              onChange={(e) =>
+                setEditForm({ ...editForm, email: e.target.value })
+              }
+              margin="normal"
+            />
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Role</InputLabel>
+              <Select
+                value={editForm.role}
+                label="Role"
+                onChange={(e) =>
+                  setEditForm({ ...editForm, role: e.target.value })
+                }
+              >
+                <MenuItem value="USER">User</MenuItem>
+                <MenuItem value="ADMIN">Admin</MenuItem>
+                <MenuItem value="SUPERADMIN">Super Admin</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={editForm.status}
+                label="Status"
+                onChange={(e) =>
+                  setEditForm({ ...editForm, status: e.target.value })
+                }
+              >
+                <MenuItem value="ACTIVE">Active</MenuItem>
+                <MenuItem value="INACTIVE">Inactive</MenuItem>
+              </Select>
+            </FormControl>
           </Box>
-        </Box>
-
-        {/* Users Table */}
-        <Card>
-          <CardContent>
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Email</TableCell>
-                    <TableCell>Role</TableCell>
-                    <TableCell>Status</TableCell>
-                    <TableCell>Created</TableCell>
-                    <TableCell>Last Login</TableCell>
-                    <TableCell>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>
-                        {user.firstName} {user.lastName}
-                      </TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        <Chip
-                          label={user.role}
-                          color={getRoleColor(user.role)}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={user.status}
-                          color={getStatusColor(user.status)}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        {user.lastLoginAt
-                          ? new Date(user.lastLoginAt).toLocaleDateString()
-                          : "Never"}
-                      </TableCell>
-                      <TableCell>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEditUser(user)}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => handleDeleteUser(user.id, `${user.firstName} ${user.lastName}`)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </CardContent>
-        </Card>
-
-        {/* Edit User Dialog */}
-        <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>Edit User</DialogTitle>
-          <DialogContent>
-            <Box sx={{ pt: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="First Name"
-                    value={formData.firstName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, firstName: e.target.value })
-                    }
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Last Name"
-                    value={formData.lastName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, lastName: e.target.value })
-                    }
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Role</InputLabel>
-                    <Select
-                      value={formData.role}
-                      onChange={(e) =>
-                        setFormData({ ...formData, role: e.target.value as any })
-                      }
-                      label="Role"
-                    >
-                      <MenuItem value="USER">User</MenuItem>
-                      <MenuItem value="ADMIN">Admin</MenuItem>
-                      <MenuItem value="SUPERADMIN">Super Admin</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      value={formData.status}
-                      onChange={(e) =>
-                        setFormData({ ...formData, status: e.target.value as any })
-                      }
-                      label="Status"
-                    >
-                      <MenuItem value="ACTIVE">Active</MenuItem>
-                      <MenuItem value="INACTIVE">Inactive</MenuItem>
-                      <MenuItem value="SUSPENDED">Suspended</MenuItem>
-                      <MenuItem value="PENDING_VERIFICATION">Pending Verification</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveUser} variant="contained">
-              Save Changes
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Container>
-    </AdminOnly>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleSave} variant="contained">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </AdminLayout>
   );
 }
