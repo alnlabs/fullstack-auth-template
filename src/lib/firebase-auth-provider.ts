@@ -1,13 +1,12 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { auth } from "./firebase";
 import { prisma } from "./prisma";
 import { AuthUtils } from "./auth";
-import { UserRole, UserStatus } from "@prisma/client";
+import { UserRole, UserStatus, AuthProvider } from "@prisma/client";
 
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+export const firebaseAuthProvider: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -35,6 +34,7 @@ export const authOptions: NextAuthOptions = {
           // Check if input is email or username
           const isEmail = credentials.emailOrUsername.includes("@");
 
+          // Find user in database
           const user = await prisma.user.findFirst({
             where: isEmail
               ? { email: credentials.emailOrUsername }
@@ -59,6 +59,7 @@ export const authOptions: NextAuthOptions = {
             );
           }
 
+          // Verify password with bcrypt (local auth)
           const isPasswordValid = await AuthUtils.comparePassword(
             credentials.password,
             user.password
@@ -97,11 +98,11 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account?.provider === "google") {
+      if (account?.provider === 'google') {
         try {
           // Check if user already exists
           const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! },
+            where: { email: user.email! }
           });
 
           if (existingUser) {
@@ -109,70 +110,68 @@ export const authOptions: NextAuthOptions = {
             await prisma.user.update({
               where: { id: existingUser.id },
               data: {
-                authProvider: "GOOGLE",
+                authProvider: 'GOOGLE',
                 providerId: account.providerAccountId,
                 providerData: {
                   googleId: account.providerAccountId,
                   picture: user.image,
-                  locale: (profile as any)?.locale,
+                  locale: (profile as any)?.locale
                 },
                 avatar: user.image,
                 emailVerified: true,
-                status: "ACTIVE",
-              },
+                status: 'ACTIVE'
+              }
             });
 
             // Log Google sign-in
             await AuthUtils.logUserAction({
               userId: existingUser.id,
-              action: "LOGIN_SUCCESS",
-              details: { method: "google", provider: "GOOGLE" },
+              action: 'LOGIN_SUCCESS',
+              details: { method: 'google', provider: 'GOOGLE' }
             });
           } else {
             // Generate unique username for Google user
-            const baseUsername = user.email!.split("@")[0];
-            const username = await AuthUtils.generateUniqueUsername(
-              baseUsername
-            );
-
+            const baseUsername = user.email!.split('@')[0];
+            const username = await AuthUtils.generateUniqueUsername(baseUsername);
+            
             // Create new user from Google
             const newUser = await prisma.user.create({
               data: {
                 email: user.email!,
                 username: username,
-                firstName: user.name?.split(" ")[0] || "",
-                lastName: user.name?.split(" ").slice(1).join(" ") || "",
-                displayName: user.name || "",
-                avatar: user.image || "",
-                role: "USER",
-                status: "ACTIVE",
+                firstName: user.name?.split(' ')[0] || '',
+                lastName: user.name?.split(' ').slice(1).join(' ') || '',
+                displayName: user.name || '',
+                avatar: user.image || '',
+                role: 'USER',
+                status: 'ACTIVE',
                 emailVerified: true,
-                authProvider: "GOOGLE",
+                authProvider: 'GOOGLE',
                 providerId: account.providerAccountId,
                 providerData: {
                   googleId: account.providerAccountId,
                   picture: user.image,
-                  locale: (profile as any)?.locale,
-                },
-              },
+                  locale: (profile as any)?.locale
+                }
+              }
             });
 
             // Log user creation
             await AuthUtils.logUserAction({
               userId: newUser.id,
-              action: "USER_CREATED",
-              details: { method: "google", provider: "GOOGLE" },
+              action: 'USER_CREATED',
+              details: { method: 'google', provider: 'GOOGLE' }
             });
           }
         } catch (error) {
-          console.error("Google sign-in error:", error);
+          console.error('Google sign-in error:', error);
           return false;
         }
       }
 
       return true;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
         token.status = user.status;
@@ -193,13 +192,9 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth/signin",
     signUp: "/auth/signup",
     error: "/auth/error",
-    verifyRequest: "/auth/verify-request",
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
-  jwt: {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,

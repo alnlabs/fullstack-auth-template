@@ -1,9 +1,4 @@
-import {
-  PrismaClient,
-  UserRole,
-  UserStatus,
-  AuthProvider,
-} from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { AuthUtils } from "../src/lib/auth";
 
 const prisma = new PrismaClient();
@@ -22,6 +17,7 @@ async function main() {
 
   // Create Super Admin
   const superAdminPassword = await AuthUtils.hashPassword("superadmin123");
+
   const superAdmin = await prisma.user.create({
     data: {
       email: "superadmin@mymentor.com",
@@ -30,10 +26,10 @@ async function main() {
       lastName: "Admin",
       displayName: "Super Administrator",
       password: superAdminPassword,
-      role: UserRole.SUPERADMIN,
-      status: UserStatus.ACTIVE,
+      role: "SUPERADMIN",
+      status: "ACTIVE",
       emailVerified: true,
-      authProvider: AuthProvider.LOCAL,
+      authProvider: "LOCAL",
       bio: "System Super Administrator",
       phone: "+1234567890",
       location: "Global",

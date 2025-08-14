@@ -188,18 +188,18 @@ export class AuthUtils {
   static async generateUniqueUsername(baseUsername: string): Promise<string> {
     let username = baseUsername;
     let counter = 1;
-    
+
     // Check if username exists and generate unique one
     while (await prisma.user.findUnique({ where: { username } })) {
       username = `${baseUsername}${counter}`;
       counter++;
-      
+
       // Prevent infinite loop
       if (counter > 100) {
-        throw new Error('Unable to generate unique username');
+        throw new Error("Unable to generate unique username");
       }
     }
-    
+
     return username;
   }
 

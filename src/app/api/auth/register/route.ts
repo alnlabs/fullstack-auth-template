@@ -47,20 +47,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password
+        // Hash password
     const hashedPassword = await AuthUtils.hashPassword(validatedData.password);
 
     // Generate email verification token
     const emailVerificationToken = AuthUtils.generateEmailVerificationToken();
     const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-          // Create user
-      const user = await prisma.user.create({
-        data: {
-          email: validatedData.email,
-          username: validatedData.username,
-          firstName: validatedData.firstName,
-          lastName: validatedData.lastName,
+    // Create user in database
+    const user = await prisma.user.create({
+      data: {
+        email: validatedData.email,
+        username: validatedData.username,
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
         displayName: `${validatedData.firstName} ${validatedData.lastName}`,
         password: hashedPassword,
         role: UserRole.USER,

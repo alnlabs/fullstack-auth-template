@@ -7,7 +7,10 @@ const checkUsernameSchema = z.object({
     .string()
     .min(3, "Username must be at least 3 characters")
     .max(20, "Username must be at most 20 characters")
-    .regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, underscores, and hyphens"),
+    .regex(
+      /^[a-zA-Z0-9_-]+$/,
+      "Username can only contain letters, numbers, underscores, and hyphens"
+    ),
 });
 
 export async function POST(request: NextRequest) {
@@ -23,14 +26,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       available: !existingUser,
-      message: existingUser 
-        ? "Username is already taken" 
+      message: existingUser
+        ? "Username is already taken"
         : "Username is available",
     });
-
   } catch (error) {
     console.error("Username check error:", error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

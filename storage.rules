@@ -1,0 +1,25 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Users can upload and manage their own files
+    match /users/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Public read access for user avatars
+    match /users/{userId}/avatar/{fileName} {
+      allow read: if true;
+    }
+
+    // Admin access for all files
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in ['ADMIN', 'SUPERADMIN'];
+    }
+
+    // Default deny
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

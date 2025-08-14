@@ -28,6 +28,7 @@ enum AuthProvider {
   GOOGLE
   FACEBOOK
   GITHUB
+  FIREBASE
 }
 
 model User {

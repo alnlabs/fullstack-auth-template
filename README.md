@@ -51,9 +51,9 @@ A comprehensive authentication system built with Next.js, Node.js, Passport, Pri
 ## 🛠️ Tech Stack
 
 - **Frontend**: Next.js 14, TypeScript, Tailwind CSS
-- **Backend**: Node.js, NextAuth.js, Passport.js
+- **Backend**: Node.js, NextAuth.js
 - **Database**: PostgreSQL 15, Prisma ORM
-- **Authentication**: JWT, Google OAuth 2.0
+- **Authentication**: Local Auth + Firebase Google OAuth 2.0
 - **Containerization**: Docker, Docker Compose
 - **Monitoring**: Prometheus, Grafana
 - **Email**: Nodemailer, MailHog (dev)
@@ -65,6 +65,7 @@ A comprehensive authentication system built with Next.js, Node.js, Passport, Pri
 - Node.js 18+
 - Docker & Docker Compose
 - PostgreSQL (for local development without Docker)
+- Firebase project (for Google OAuth)
 - Google OAuth credentials (for Google sign-in)
 
 ## 🚀 Quick Start
@@ -106,6 +107,17 @@ JWT_REFRESH_SECRET="your-jwt-refresh-secret-key"
 # NextAuth
 NEXTAUTH_SECRET="your-nextauth-secret"
 NEXTAUTH_URL="http://localhost:3000"
+
+# Firebase Configuration
+NEXT_PUBLIC_FIREBASE_API_KEY="your-firebase-api-key"
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="your-project.firebaseapp.com"
+NEXT_PUBLIC_FIREBASE_PROJECT_ID="your-project-id"
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="your-project.appspot.com"
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="123456789"
+NEXT_PUBLIC_FIREBASE_APP_ID="your-app-id"
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="G-XXXXXXXXXX"
+
+
 ```
 
 ### 3. Start Development Environment
@@ -149,6 +161,7 @@ After running the database seed, you'll have access to a default superadmin user
 # - App: http://localhost:3000
 # - PgAdmin: http://localhost:5050
 # - MailHog: http://localhost:8025
+
 # - PostgreSQL: localhost:5432
 # - Redis: localhost:6379
 ```
