@@ -21,14 +21,22 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <Box sx={{ width: "100%" }}>
+      <Box 
+        sx={{ 
+          width: "100%", 
+          maxWidth: "none",
+          backgroundColor: "yellow",
+          border: "2px solid red",
+          minHeight: "100px"
+        }}
+      >
         <PageHeader
           title="Dashboard"
           subtitle="Welcome back! Here's what's happening with your system."
         />
 
         {/* Stats Grid */}
-        <Grid container spacing={3} mb={4}>
+        <Grid container spacing={3} mb={4} sx={{ width: "100%" }}>
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
               title="Total Users"
@@ -68,7 +76,7 @@ export default function AdminDashboardPage() {
         </Grid>
 
         {/* Quick Actions */}
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{ width: "100%" }}>
           <Grid item xs={12} md={6}>
             <StatCard
               title="Recent Activity"
