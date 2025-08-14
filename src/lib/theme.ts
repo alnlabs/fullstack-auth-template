@@ -11,7 +11,7 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: [
-      'Inter',
+      'Poppins',
       '-apple-system',
       'BlinkMacSystemFont',
       '"Segoe UI"',
@@ -23,6 +23,24 @@ export const theme = createTheme({
       textTransform: 'none',
       fontWeight: 600,
     },
+    h1: {
+      fontWeight: 700,
+    },
+    h2: {
+      fontWeight: 600,
+    },
+    h3: {
+      fontWeight: 600,
+    },
+    h4: {
+      fontWeight: 600,
+    },
+    h5: {
+      fontWeight: 500,
+    },
+    h6: {
+      fontWeight: 500,
+    },
   },
   shape: {
     borderRadius: 8,
@@ -33,6 +51,7 @@ export const theme = createTheme({
         root: {
           borderRadius: 8,
           padding: '10px 24px',
+          fontWeight: 600,
         },
       },
     },
