@@ -114,8 +114,8 @@ export default function AdminUsersPage() {
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      (user.name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (user.email?.toLowerCase() || "").includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
     const matchesStatus =
       statusFilter === "all" || user.status === statusFilter;
@@ -253,32 +253,32 @@ export default function AdminUsersPage() {
                       <TableRow key={user.id} hover>
                         <TableCell>
                           <Typography variant="body2" fontWeight={500}>
-                            {user.name}
+                            {user.name || "No Name"}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2" color="text.secondary">
-                            {user.email}
+                            {user.email || "No Email"}
                           </Typography>
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={user.role}
-                            color={getRoleColor(user.role)}
+                            label={user.role || "USER"}
+                            color={getRoleColor(user.role || "USER")}
                             size="small"
                             variant="outlined"
                           />
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={user.status}
-                            color={getStatusColor(user.status)}
+                            label={user.status || "ACTIVE"}
+                            color={getStatusColor(user.status || "ACTIVE")}
                             size="small"
                           />
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2" color="text.secondary">
-                            {new Date(user.createdAt).toLocaleDateString()}
+                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
                           </Typography>
                         </TableCell>
                         <TableCell>
