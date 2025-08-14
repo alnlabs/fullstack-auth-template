@@ -73,7 +73,7 @@ export const firebaseAuthProvider: NextAuthOptions = {
             id: user.id,
             email: user.email,
             name: user.displayName || `${user.firstName} ${user.lastName}`,
-            image: user.avatar,
+            image: user.avatar || undefined,
             role: user.role,
             status: user.status,
           };
@@ -103,8 +103,7 @@ export const firebaseAuthProvider: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/auth/signin",
-    signUp: "/auth/signup",
+    signIn: "/auth/login",
     error: "/auth/error",
   },
   session: {

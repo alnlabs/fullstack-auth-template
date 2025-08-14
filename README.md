@@ -1,6 +1,6 @@
 # 🚀 Fullstack Authentication Template
 
-A comprehensive, production-ready fullstack authentication and file management system built with **Next.js 14**, **Prisma**, **PostgreSQL**, and **Firebase**. Perfect as a starting template for your next project.
+A **simple and functional** authentication template built with **Next.js 14**, **MUI**, **Firebase**, and **PostgreSQL**. Perfect as a starting point for your next project without overengineering.
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
@@ -20,13 +20,21 @@ A comprehensive, production-ready fullstack authentication and file management s
 - **Session Management** - NextAuth.js integration
 - **Account Security** - Login attempts, account locking, activity logging
 
+### 👥 **User Management**
+
+- **User Profiles** - Complete profile management with avatar upload
+- **Admin Panel** - User management with search, filtering, and role assignment
+- **Account Settings** - Security, notifications, privacy settings
+- **Activity Logging** - Complete audit trail of user actions
+
 ### 📁 **File Management**
 
-- **Avatar Upload** - Profile picture management (5MB max)
-- **Document Upload** - Resume, portfolio, certificate uploads (10MB max)
-- **Bulk Upload** - Multiple file upload support (up to 10 files)
+- **Avatar Upload** - Profile picture management (2MB max)
+- **Document Upload** - Resume, portfolio, certificate uploads (5MB max)
+- **Drag & Drop** - Modern file upload interface
+- **File Validation** - Type and size restrictions
+- **Bulk Upload** - Multiple file upload support
 - **File Categories** - Organized document management
-- **Admin Oversight** - Complete file management for admins
 
 ### 🛡️ **Security Features**
 

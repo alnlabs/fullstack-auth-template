@@ -13,8 +13,10 @@ const registerSchema = z.object({
     .string()
     .min(3, "Username must be at least 3 characters")
     .max(20, "Username must be at most 20 characters")
-    .regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, underscores, and hyphens")
-    .required(),
+    .regex(
+      /^[a-zA-Z0-9_-]+$/,
+      "Username can only contain letters, numbers, underscores, and hyphens"
+    ),
 });
 
 export async function POST(request: NextRequest) {
@@ -47,8 +49,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-        // Hash password
-    const hashedPassword = await AuthUtils.hashPassword(validatedData.password);
+    // Hash password
+    const hashedPassword = await AuthUtils.hashPassword(
+      validatedData.password as string
+    );
 
     // Generate email verification token
     const emailVerificationToken = AuthUtils.generateEmailVerificationToken();
@@ -57,10 +61,10 @@ export async function POST(request: NextRequest) {
     // Create user in database
     const user = await prisma.user.create({
       data: {
-        email: validatedData.email,
-        username: validatedData.username,
-        firstName: validatedData.firstName,
-        lastName: validatedData.lastName,
+        email: validatedData.email as string,
+        username: validatedData.username as string,
+        firstName: validatedData.firstName as string,
+        lastName: validatedData.lastName as string,
         displayName: `${validatedData.firstName} ${validatedData.lastName}`,
         password: hashedPassword,
         role: UserRole.USER,
