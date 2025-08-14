@@ -18,8 +18,20 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
 }
 
 #__next {
   height: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
+}
+
+/* Prevent horizontal overflow on all containers */
+body > * {
+  overflow-x: hidden;
+}
+
+/* Ensure MUI components don't cause horizontal scroll */
+.MuiBox-root {
+  overflow-x: hidden;
 }
