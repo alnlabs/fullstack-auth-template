@@ -5,8 +5,8 @@
 
 set -e
 
-echo "🚀 MyMentor Authentication Template Setup"
-echo "========================================"
+echo "🚀 Fullstack Authentication Template Setup"
+echo "=========================================="
 
 # Colors for output
 RED='\033[0;31m'
@@ -47,7 +47,7 @@ check_node() {
         print_error "Node.js is not installed. Please install Node.js 18+ and try again."
         exit 1
     fi
-    
+
     NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
     if [ "$NODE_VERSION" -lt 18 ]; then
         print_error "Node.js version 18+ is required. Current version: $(node -v)"
@@ -66,7 +66,7 @@ install_dependencies() {
 # Setup environment
 setup_environment() {
     print_info "Setting up environment..."
-    
+
     if [ ! -f .env.local ]; then
         cp env.development .env.local
         print_status "Environment file created (.env.local)"
@@ -79,33 +79,33 @@ setup_environment() {
 # Start development environment
 start_dev_environment() {
     print_info "Starting development environment..."
-    
+
     # Make scripts executable
     chmod +x scripts/*.sh
-    
+
     # Start Docker services
     ./scripts/docker-dev.sh start
-    
+
     print_status "Development environment started"
 }
 
 # Setup database
 setup_database() {
     print_info "Setting up database..."
-    
+
     # Wait for database to be ready
     print_info "Waiting for database to be ready..."
     sleep 10
-    
+
     # Generate Prisma client
     npm run db:generate
-    
+
     # Run migrations
     npm run db:migrate
-    
+
     # Seed database
     npm run db:seed
-    
+
     print_status "Database setup complete"
 }
 
@@ -157,23 +157,23 @@ show_next_steps() {
 main() {
     echo "Starting template setup..."
     echo ""
-    
+
     # Run checks
     check_docker
     check_node
-    
+
     # Install dependencies
     install_dependencies
-    
+
     # Setup environment
     setup_environment
-    
+
     # Start development environment
     start_dev_environment
-    
+
     # Setup database
     setup_database
-    
+
     # Show next steps
     show_next_steps
 }

@@ -1,6 +1,6 @@
-# 🚀 MyMentor Authentication Template
+# 🚀 Fullstack Authentication Template
 
-A comprehensive, production-ready authentication and file management system built with **Next.js 14**, **Prisma**, **PostgreSQL**, and **Firebase**. Perfect as a starting template for your next project.
+A comprehensive, production-ready fullstack authentication and file management system built with **Next.js 14**, **Prisma**, **PostgreSQL**, and **Firebase**. Perfect as a starting template for your next project.
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
@@ -11,6 +11,7 @@ A comprehensive, production-ready authentication and file management system buil
 ## ✨ Features
 
 ### 🔐 **Authentication System**
+
 - **Local Authentication** - Email/username + password login
 - **Google OAuth** - Firebase-powered Google authentication
 - **Role-Based Access Control** - SuperAdmin, Admin, User roles
@@ -20,6 +21,7 @@ A comprehensive, production-ready authentication and file management system buil
 - **Account Security** - Login attempts, account locking, activity logging
 
 ### 📁 **File Management**
+
 - **Avatar Upload** - Profile picture management (5MB max)
 - **Document Upload** - Resume, portfolio, certificate uploads (10MB max)
 - **Bulk Upload** - Multiple file upload support (up to 10 files)
@@ -27,6 +29,7 @@ A comprehensive, production-ready authentication and file management system buil
 - **Admin Oversight** - Complete file management for admins
 
 ### 🛡️ **Security Features**
+
 - **Password Hashing** - Bcrypt encryption
 - **JWT Tokens** - Secure token management
 - **Input Validation** - Zod schema validation
@@ -35,6 +38,7 @@ A comprehensive, production-ready authentication and file management system buil
 - **Rate Limiting** - Protection against abuse
 
 ### 🗄️ **Database**
+
 - **PostgreSQL** - Robust relational database
 - **Prisma ORM** - Type-safe database operations
 - **Migrations** - Database schema management
@@ -43,20 +47,22 @@ A comprehensive, production-ready authentication and file management system buil
 ## 🚀 Quick Start
 
 ### Option 1: Automated Setup (Recommended)
+
 ```bash
 # Clone the repository
-git clone https://github.com/alnlabs/mymentor-web.git
-cd mymentor-web
+git clone https://github.com/alnlabs/fullstack-auth-template.git
+cd fullstack-auth-template
 
 # Run the automated setup script
 ./scripts/setup-template.sh
 ```
 
 ### Option 2: Manual Setup
+
 ```bash
 # Clone the repository
-git clone https://github.com/alnlabs/mymentor-web.git
-cd mymentor-web
+git clone https://github.com/alnlabs/fullstack-auth-template.git
+cd fullstack-auth-template
 
 # Install dependencies
 npm install
@@ -80,13 +86,14 @@ Your application will be available at `http://localhost:4800`
 
 ## 📋 Prerequisites
 
-- **Node.js** 18+ 
+- **Node.js** 18+
 - **Docker** & Docker Compose
 - **Git**
 
 ## ⚙️ Configuration
 
 ### Environment Variables
+
 Copy `env.development` to `.env.local` and configure:
 
 ```env
@@ -108,6 +115,7 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID="your-project-id"
 ```
 
 ### Default SuperAdmin
+
 - **Email**: `superadmin@mymentor.com`
 - **Password**: `SuperAdmin123!`
 
@@ -120,7 +128,7 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID="your-project-id"
 ## 🏗️ Architecture
 
 ```
-mymentor-web/
+fullstack-auth-template/
 ├── src/
 │   ├── app/
 │   │   ├── api/
@@ -147,6 +155,7 @@ mymentor-web/
 ## 🔌 API Endpoints
 
 ### Authentication (6 endpoints)
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/check-username` - Username availability
 - `POST /api/auth/verify-email` - Email verification
@@ -155,15 +164,18 @@ mymentor-web/
 - `GET /api/auth/session` - Get session
 
 ### Password Management (3 endpoints)
+
 - `POST /api/users/forgot-password` - Request password reset
 - `POST /api/users/reset-password` - Reset password
 - `POST /api/users/change-password` - Change password
 
 ### User Profile (2 endpoints)
+
 - `GET /api/users/profile` - Get user profile
 - `PUT /api/users/profile` - Update user profile
 
 ### File Upload (6 endpoints)
+
 - `POST /api/users/upload-avatar` - Upload profile picture
 - `POST /api/users/upload-document` - Upload single document
 - `POST /api/users/bulk-upload` - Upload multiple documents
@@ -173,6 +185,7 @@ mymentor-web/
 - `DELETE /api/users/documents` - Delete document
 
 ### Admin Management (3 endpoints)
+
 - `GET /api/admin/users` - List all users
 - `PUT /api/admin/users` - Update user (admin)
 - `GET /api/admin/documents` - List all documents
@@ -180,17 +193,20 @@ mymentor-web/
 ## 🛠️ Customization
 
 ### Adding New User Fields
+
 1. Update `prisma/schema.prisma`
 2. Run migration: `npm run db:migrate`
 3. Update TypeScript types in `src/types/auth.ts`
 4. Modify API endpoints as needed
 
 ### Adding New File Types
+
 1. Update `ALLOWED_TYPES` in upload endpoints
 2. Add new categories to `DocumentCategory` enum
 3. Update validation schemas
 
 ### Adding New Roles
+
 1. Update `UserRole` enum in schema
 2. Modify role-based access control in `AuthUtils`
 3. Update admin endpoints
@@ -208,6 +224,7 @@ npm run test
 ## 🚀 Deployment
 
 ### Production Setup
+
 ```bash
 # Build production image
 docker-compose -f docker-compose.prod.yml build
@@ -219,6 +236,7 @@ docker-compose -f docker-compose.prod.yml up -d
 ## 📁 File Storage
 
 Files are stored in organized directories:
+
 - `/public/uploads/avatars/` - Profile pictures
 - `/public/uploads/documents/` - User documents
 
@@ -232,6 +250,7 @@ Files are stored in organized directories:
 ## 🎯 Use Cases
 
 This template is perfect for:
+
 - **SaaS Applications** - User management and file storage
 - **Portfolio Platforms** - Document and media management
 - **Learning Management Systems** - User roles and file uploads
@@ -253,6 +272,7 @@ This template is provided as-is for educational and commercial use.
 ## 🆘 Support
 
 For issues and questions:
+
 1. Check the [TEMPLATE_SETUP.md](./TEMPLATE_SETUP.md) guide
 2. Review the [API_ENDPOINTS.md](./API_ENDPOINTS.md) documentation
 3. Check environment configuration

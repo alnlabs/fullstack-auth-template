@@ -1,6 +1,6 @@
-# 🚀 MyMentor Authentication Template - Setup Guide
+# 🚀 Fullstack Authentication Template - Setup Guide
 
-This is a comprehensive authentication and file management system built with Next.js 14, Prisma, PostgreSQL, and Firebase. Use this as a starting template for your projects.
+This is a comprehensive fullstack authentication and file management system built with Next.js 14, Prisma, PostgreSQL, and Firebase. Use this as a starting template for your projects.
 
 ## ✨ Features Included
 
@@ -37,7 +37,7 @@ This is a comprehensive authentication and file management system built with Nex
 ## 🏗️ Architecture
 
 ```
-mymentor-web/
+fullstack-auth-template/
 ├── src/
 │   ├── app/
 │   │   ├── api/
@@ -65,8 +65,8 @@ mymentor-web/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/mymentor-web.git
-cd mymentor-web
+git clone https://github.com/your-username/fullstack-auth-template.git
+cd fullstack-auth-template
 ```
 
 ### 2. Install Dependencies
