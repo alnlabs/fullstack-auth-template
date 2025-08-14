@@ -21,7 +21,7 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <TabContent 
+      <TabContent
         title="Admin Dashboard"
         subtitle="Overview of system statistics and performance"
       >
