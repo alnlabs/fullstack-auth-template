@@ -35,8 +35,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           sx={{
             flexGrow: 1,
             minHeight: "100vh",
-            marginLeft: `${sidebarOpen ? drawerWidth : collapsedDrawerWidth}px`,
-            transition: "margin-left 0.2s",
             width: `calc(100vw - ${sidebarOpen ? drawerWidth : collapsedDrawerWidth}px)`,
             maxWidth: "none",
             backgroundColor: "lightblue",
@@ -44,9 +42,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           }}
         >
           <Toolbar />
-          <Box 
-            sx={{ 
-              p: 1, 
+          <Box
+            sx={{
+              p: 1,
               width: 1, // This is 100% according to MUI System
               maxWidth: "none",
               backgroundColor: "pink",

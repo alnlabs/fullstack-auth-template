@@ -36,11 +36,11 @@ export default function AdminDashboardPage() {
         />
 
         {/* Stats Grid */}
-        <Box 
-          sx={{ 
-            display: "flex", 
-            flexWrap: "wrap", 
-            gap: 2, 
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
             mb: 4,
             width: 1, // This is 100% according to MUI System
           }}
@@ -84,10 +84,10 @@ export default function AdminDashboardPage() {
         </Box>
 
         {/* Quick Actions */}
-        <Box 
-          sx={{ 
-            display: "flex", 
-            flexWrap: "wrap", 
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
             gap: 2,
             width: 1, // This is 100% according to MUI System
           }}
