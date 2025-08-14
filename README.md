@@ -13,7 +13,7 @@ A comprehensive, production-ready fullstack authentication and file management s
 ### 🔐 **Authentication System**
 
 - **Local Authentication** - Email/username + password login
-- **Google OAuth** - Firebase-powered Google authentication
+- **Firebase Authentication** - Google sign-in via Firebase
 - **Role-Based Access Control** - SuperAdmin, Admin, User roles
 - **Email Verification** - Secure email verification flow
 - **Password Reset** - Forgot password and reset functionality
@@ -104,14 +104,15 @@ DATABASE_URL="postgresql://username:password@localhost:5432/mymentor_dev"
 NEXTAUTH_SECRET="your-secret-key"
 NEXTAUTH_URL="http://localhost:4800"
 
-# Google OAuth (Firebase)
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
+# Firebase Authentication
 
 # Firebase
 NEXT_PUBLIC_FIREBASE_API_KEY="your-firebase-api-key"
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="your-project.firebaseapp.com"
 NEXT_PUBLIC_FIREBASE_PROJECT_ID="your-project-id"
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="your-project.appspot.com"
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="123456789"
+NEXT_PUBLIC_FIREBASE_APP_ID="your-app-id"
 ```
 
 ### Default SuperAdmin

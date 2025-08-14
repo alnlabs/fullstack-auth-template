@@ -89,14 +89,13 @@ DATABASE_URL="postgresql://username:password@localhost:5432/mymentor_dev"
 NEXTAUTH_SECRET="your-secret-key"
 NEXTAUTH_URL="http://localhost:4800"
 
-# Google OAuth (Firebase)
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
-
 # Firebase
 NEXT_PUBLIC_FIREBASE_API_KEY="your-firebase-api-key"
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="your-project.firebaseapp.com"
 NEXT_PUBLIC_FIREBASE_PROJECT_ID="your-project-id"
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="your-project.appspot.com"
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="123456789"
+NEXT_PUBLIC_FIREBASE_APP_ID="your-app-id"
 ```
 
 ### 4. Start Development Environment
@@ -128,15 +127,9 @@ The template uses PostgreSQL with Docker Compose. Three environments are configu
 ### Firebase Setup
 1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
 2. Enable Authentication and Google provider
-3. Get your Firebase configuration
-4. Update environment variables
-
-### Google OAuth Setup
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create OAuth 2.0 credentials
-3. Add authorized redirect URIs:
-   - `http://localhost:4800/api/auth/callback/google` (development)
-   - `https://yourdomain.com/api/auth/callback/google` (production)
+3. Get your Firebase configuration from Project Settings
+4. Update environment variables with your Firebase config
+5. Configure Firebase Authentication rules in `firestore.rules` and `storage.rules`
 
 ## 📚 API Documentation
 
